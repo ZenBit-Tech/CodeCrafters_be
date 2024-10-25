@@ -1,8 +1,8 @@
+import { RouteStatuses } from 'common/enums/enums';
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Company } from './company.entity';
 import { User } from './user.entity';
-import { RouteStatuses } from 'common/enums/enums';
 
 @Entity()
 export class Route {

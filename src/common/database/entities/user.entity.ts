@@ -1,7 +1,7 @@
+import { Roles } from 'common/enums/enums';
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Company } from './company.entity';
-import { Roles } from 'common/enums/enums';
 
 @Entity()
 export class User {

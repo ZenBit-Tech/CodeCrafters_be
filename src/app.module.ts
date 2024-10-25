@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Company } from 'common/database/entities/company.entity';
+import { Customer } from 'common/database/entities/customer.entity';
+import { LuggageImages } from 'common/database/entities/luggage-imgs.entity';
+import { Luggage } from 'common/database/entities/luggage.entity';
+import { Notification } from 'common/database/entities/notification.entity';
+import { Order } from 'common/database/entities/order.entity';
+import { Route } from 'common/database/entities/route.entity';
+import { User } from 'common/database/entities/user.entity';
 
 import { DatabaseModule } from './common/database/database.module';
 import { ModuleExampleModule } from './modules/module-example/module-example.module';
-import { User } from 'common/database/entities/user.entity';
-import { Route } from 'common/database/entities/route.entity';
-import { Company } from 'common/database/entities/company.entity';
-import { Order } from 'common/database/entities/order.entity';
-import { Luggage } from 'common/database/entities/luggage.entity';
-import { LuggageImages } from 'common/database/entities/luggage-imgs.entity';
-import { Customer } from 'common/database/entities/customer.entity';
-import { Notification } from 'common/database/entities/notification.entity';
 
 @Module({
   imports: [

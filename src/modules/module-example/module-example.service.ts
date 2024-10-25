@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Error } from 'common/types/interfaces';
 import { DeleteResult, EntityManager, Repository } from 'typeorm';
 
 import { CreateModuleExampleDto } from './dto/create-module-example.dto';
 import { UpdateModuleExampleDto } from './dto/update-module-example.dto';
 import { Company } from '../../common/database/entities/company.entity';
-import { IError } from 'common/types/interfaces';
 
 @Injectable()
 export class ModuleExampleService {
@@ -15,7 +15,7 @@ export class ModuleExampleService {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async create(createModuleExampleDto: CreateModuleExampleDto): Promise<Company | IError> {
+  async create(createModuleExampleDto: CreateModuleExampleDto): Promise<Company | Error> {
     try {
       const company = new Company(createModuleExampleDto);
 
@@ -27,12 +27,12 @@ export class ModuleExampleService {
       return {
         statusCode: 404,
         error: 'Bad request',
-        messagages: [`${error}`],
+        messagages: ['Something went wrong'],
       };
     }
   }
 
-  async findAll(): Promise<Company[] | IError> {
+  async findAll(): Promise<Company[] | Error> {
     try {
       const companies: Company[] = await this.companyRepo.find();
 
@@ -42,24 +42,24 @@ export class ModuleExampleService {
       return {
         statusCode: 404,
         error: 'Bad request',
-        messagages: [`${error}`],
+        messagages: ['Something went wrong'],
       };
     }
   }
 
-  async findOne(id: number): Promise<Company | IError> {
+  async findOne(id: number): Promise<Company | Error> {
     try {
       return await this.companyRepo.findOneOrFail({ where: { id } });
     } catch (error) {
       return {
         statusCode: 404,
         error: 'Bad request',
-        messagages: [`${error}`],
+        messagages: ['Something went wrong'],
       };
     }
   }
 
-  async update(id: number, updateModuleExampleDto: UpdateModuleExampleDto): Promise<Company | IError> {
+  async update(id: number, updateModuleExampleDto: UpdateModuleExampleDto): Promise<Company | Error> {
     try {
       const company = await this.companyRepo.findOneOrFail({ where: { id } });
 
@@ -74,19 +74,19 @@ export class ModuleExampleService {
       return {
         statusCode: 404,
         error: 'Bad request',
-        messagages: [`${error}`],
+        messagages: ['Something went wrong'],
       };
     }
   }
 
-  async remove(id: number): Promise<DeleteResult | IError> {
+  async remove(id: number): Promise<DeleteResult | Error> {
     try {
       return await this.companyRepo.delete(id);
     } catch (error) {
       return {
         statusCode: 404,
         error: 'Bad request',
-        messagages: [`${error}`],
+        messagages: ['Something went wrong'],
       };
     }
   }

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Company } from 'common/database/entities/company.entity';
 
 import { ModuleExampleController } from './module-example.controller';
 import { ModuleExampleService } from './module-example.service';
-import { Company } from 'common/database/entities/company.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Company])],

@@ -1,7 +1,7 @@
+import { LuggageTypes } from 'common/enums/enums';
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Order } from './order.entity';
-import { LuggageTypes } from 'common/enums/enums';
 
 @Entity()
 export class Luggage {

@@ -1,9 +1,9 @@
+import { OrderStatuses } from 'common/enums/enums';
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Company } from './company.entity';
 import { Customer } from './customer.entity';
 import { Route } from './route.entity';
-import { OrderStatuses } from 'common/enums/enums';
 
 @Entity()
 export class Order {
