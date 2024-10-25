@@ -11,7 +11,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('/logistic-app/api-documentation', app, document);
 
-  await app.listen(process.env['PORT'] ?? 3000);
+  await app.listen(process.env['PORT'] ?? 4000);
 }
 bootstrap().catch((error: unknown) => {
   return error;

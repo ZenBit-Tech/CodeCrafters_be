@@ -3,7 +3,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { Company } from './company.entity';
 import { Customer } from './customer.entity';
 import { Route } from './route.entity';
-import { OrderStatuses } from '../enums/order-statuses';
+import { OrderStatuses } from 'common/enums/enums';
 
 @Entity()
 export class Order {

@@ -1,22 +1,17 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-
-import { Order } from './order.entity';
-import { LuggageTypes } from '../enums/luggage-types';
+import { Luggage } from './luggage.entity';
 
 @Entity()
-export class Luggage {
+export class LuggageImages {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  luggage_type: LuggageTypes;
+  link: string;
 
-  @Column()
-  luggage_weight: number;
-
-  @ManyToOne(() => Order, (order) => order.id, { cascade: true, eager: true })
+  @ManyToOne(() => Luggage, (luggage) => luggage.id, { cascade: true, eager: true })
   @JoinColumn()
-  order_id: Order;
+  luggage_id: Luggage;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -24,7 +19,7 @@ export class Luggage {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  constructor(entity: Partial<Luggage>) {
+  constructor(entity: Partial<LuggageImages>) {
     Object.assign(this, entity);
   }
 }

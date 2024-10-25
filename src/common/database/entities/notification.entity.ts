@@ -1,33 +1,34 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-import { Company } from './company.entity';
 import { User } from './user.entity';
-import { RouteStatuses } from '../enums/route-statuses';
+import { NotificationTypes } from 'common/enums/enums';
 
 @Entity()
-export class Route {
+export class Notification {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  submission_date: Date;
+  type: NotificationTypes;
 
   @Column()
-  arrival_date: Date;
+  is_readed: boolean;
 
   @Column()
-  distance: number;
+  link_text: string;
 
   @Column()
-  status: RouteStatuses;
+  link_href: string;
+
+  @Column()
+  message: string;
+
+  @Column()
+  created_at: Date;
 
   @ManyToOne(() => User, (user) => user.id, { cascade: true, eager: true })
   @JoinColumn()
   user_id: User;
-
-  @ManyToOne(() => Company, (company) => company.id, { cascade: true, eager: true })
-  @JoinColumn()
-  company_id: Company;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -35,7 +36,7 @@ export class Route {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  constructor(entity: Partial<Route>) {
+  constructor(entity: Partial<Notification>) {
     Object.assign(this, entity);
   }
 }
