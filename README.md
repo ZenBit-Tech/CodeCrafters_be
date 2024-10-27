@@ -32,6 +32,20 @@
 $ npm install
 ```
 
+## Env file example
+
+```
+MYSQL_ROOT_PASSWORD=randomrootpassword
+MYSQL_DATABASE=nestjs_typeorm
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306:3306
+MYSQL_USERNAME=root
+MYSQL_PASSWORD=randomrootpassword
+MYSQL_SYNCHRONIZE=true
+
+PORT=4000
+```
+
 ## Running the app
 
 ```bash
