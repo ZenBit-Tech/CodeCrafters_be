@@ -8,10 +8,10 @@ export class Luggage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   luggage_type: LuggageTypes;
 
-  @Column()
+  @Column({ nullable: false })
   luggage_weight: number;
 
   @ManyToOne(() => Order, (order) => order.id, { cascade: true, eager: true })

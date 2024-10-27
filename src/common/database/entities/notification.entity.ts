@@ -8,23 +8,20 @@ export class Notification {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   type: NotificationTypes;
 
-  @Column()
+  @Column({ default: false })
   is_readed: boolean;
 
-  @Column()
+  @Column({ nullable: false })
   link_text: string;
 
-  @Column()
+  @Column({ nullable: false })
   link_href: string;
 
-  @Column()
+  @Column({ nullable: false })
   message: string;
-
-  @Column()
-  created_at: Date;
 
   @ManyToOne(() => User, (user) => user.id, { cascade: true, eager: true })
   @JoinColumn()

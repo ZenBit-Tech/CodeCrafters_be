@@ -9,16 +9,16 @@ export class Route {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   submission_date: Date;
 
-  @Column()
+  @Column({ nullable: false })
   arrival_date: Date;
 
-  @Column()
+  @Column({ nullable: false })
   distance: number;
 
-  @Column()
+  @Column({ nullable: false })
   status: RouteStatuses;
 
   @ManyToOne(() => User, (user) => user.id, { cascade: true, eager: true })

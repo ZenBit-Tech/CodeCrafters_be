@@ -7,7 +7,7 @@ export class Company {
   @ApiProperty({ example: 1, description: 'unique id' })
   id: number;
 
-  @Column({ default: '' })
+  @Column({ nullable: false })
   @ApiProperty({ example: 'Starbulka', description: 'company name' })
   name: string;
 

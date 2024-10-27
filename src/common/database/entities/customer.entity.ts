@@ -5,13 +5,13 @@ export class Customer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   full_name: string;
 
-  @Column()
+  @Column({ nullable: false })
   phone_number: string;
 
-  @Column()
+  @Column({ nullable: false })
   emial: string;
 
   @CreateDateColumn({ type: 'timestamp' })

@@ -10,10 +10,10 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   collection_date: Date;
 
-  @Column()
+  @Column({ nullable: false })
   status: OrderStatuses;
 
   @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true })

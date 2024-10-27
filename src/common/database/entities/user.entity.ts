@@ -8,16 +8,16 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ default: '' })
   logo: string;
 
-  @Column()
+  @Column({ nullable: false })
   full_name: string;
 
-  @Column()
+  @Column({ nullable: false })
   email: string;
 
-  @Column()
+  @Column({ nullable: false })
   role: Roles;
 
   @ManyToOne(() => Company, (company) => company.id, { cascade: true, eager: true })

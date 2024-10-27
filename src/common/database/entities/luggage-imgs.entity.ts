@@ -7,7 +7,7 @@ export class LuggageImages {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   link: string;
 
   @ManyToOne(() => Luggage, (luggage) => luggage.id, { cascade: true, eager: true })
