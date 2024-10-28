@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateModuleExampleDto {
   @IsString()
@@ -11,4 +11,9 @@ export class CreateModuleExampleDto {
   @IsNotEmpty()
   @ApiProperty({ example: 'https://company-logo', description: 'Company logo' })
   logo: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty({ example: 'test@email.com', description: 'Company email' })
+  email: string;
 }

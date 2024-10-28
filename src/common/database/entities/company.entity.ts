@@ -15,6 +15,10 @@ export class Company {
   @ApiProperty({ example: 'https://company-logo-link', description: 'link to company logo' })
   logo: string;
 
+  @Column({ nullable: false })
+  @ApiProperty({ example: 'company@text.mail', description: 'link to company logo' })
+  email: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   @ApiProperty({ example: '2024-10-25T03:50:01.112Z', description: 'Created at time' })
   createdAt: Date;

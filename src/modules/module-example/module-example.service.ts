@@ -65,6 +65,7 @@ export class ModuleExampleService {
 
       company.name = updateModuleExampleDto.name;
       company.logo = updateModuleExampleDto.logo;
+      company.email = updateModuleExampleDto.email;
 
       await this.entityManager.save(company);
 
