@@ -19,7 +19,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prettier-watch": "npx onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}",
     "prepare": "husky install",
-    "seed": "ts-node -r tsconfig-paths/register src/superadmin-seeding.ts"
+    "seed:superadmin": "ts-node -r tsconfig-paths/register src/common/database/seeds/superadmin-seeding.ts"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
