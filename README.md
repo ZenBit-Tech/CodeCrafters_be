@@ -44,6 +44,16 @@ MYSQL_PASSWORD=randomrootpassword
 MYSQL_SYNCHRONIZE=true
 
 PORT=4000
+
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=465
+MAIL_USER=c20ac76579a6db
+MAIL_PASSWORD=69ae99d736ec79
+
+DEFAULT_EMAIL_FROM=codecrafters@team.com
+APP_NAME=LogisticApp
+
+JWT_SECRET=6ZmendlmYppGezACBsqhLKpjZBu2HwwbpbVRJmYqg0Z7kdIq1eYD8IQcvQ2vB_DFxf6bVILoNJ_EfdtPtYYQNw
 ```
 
 ## Running the app
