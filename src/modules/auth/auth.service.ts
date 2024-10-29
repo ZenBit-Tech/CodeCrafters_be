@@ -13,15 +13,15 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async authByEmail(email: string): Promise<string | BadRequestException> {
+  async authByEmail(email: string): Promise<{ token: string } | BadRequestException> {
     try {
       const user: User = await this.userRepo.findOneOrFail({ where: { email } });
 
       const secret: string = this.configService.getOrThrow('JWT_SECRET');
       const token: string = jwt.sign({ fullName: user.full_name, email: user.email, role: user.role }, secret, { expiresIn: '12h' });
-      return token;
+      return { token };
     } catch (error) {
-      return new BadRequestException();
+      throw new BadRequestException("User with this email isn't exists");
     }
   }
 }
