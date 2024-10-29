@@ -4,7 +4,7 @@ import * as nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 import { Address } from 'nodemailer/lib/mailer';
 
-interface MailDto {
+export interface MailDto {
   from?: Address;
   recipients: Address[];
   subject: string;
@@ -44,7 +44,8 @@ export class MailerService {
     };
 
     try {
-      return await transport.sendMail(options);
+      await transport.sendMail(options);
+      return { status: 200, message: 'Message was successfully sent' };
     } catch (error) {
       return InternalServerErrorException;
     }
