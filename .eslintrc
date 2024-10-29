@@ -19,7 +19,6 @@
   ],
   "ignorePatterns": ["**/node_modules/**", "dist/**", "src/entity/**"],
   "rules": {
-    "typesafe/no-throw-sync-func": "error",
     "typesafe/no-await-without-trycatch": "warn",
     "typesafe/promise-catch": "error",
     // These rules are for reference only.

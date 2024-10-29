@@ -37,7 +37,7 @@ export class SeedingService {
         throw new Error('JWT secret is not defined');
       }
 
-      const superAdminToken: string = jwt.sign({ fullName: superAdmin.full_name, email: superAdmin.email, role: superAdmin.role }, secret, {
+      const superAdminToken: string = jwt.sign({ isLogginToken: true }, secret, {
         expiresIn: '1h',
       });
 
