@@ -11,6 +11,7 @@ import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
 
 import { DatabaseModule } from './common/database/database.module';
+import { MailerModule } from './common/mailer/mailer.module';
 import { ModuleExampleModule } from './modules/module-example/module-example.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { ModuleExampleModule } from './modules/module-example/module-example.mod
     DatabaseModule,
     TypeOrmModule.forFeature([User, Route, Company, Order, Notification, Luggage, LuggageImages, Customer]),
     ModuleExampleModule,
+    MailerModule,
   ],
   controllers: [],
   providers: [],
