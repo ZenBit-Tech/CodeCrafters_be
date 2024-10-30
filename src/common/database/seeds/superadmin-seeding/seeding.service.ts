@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
 import { MailerService } from 'common/mailer/mailer.service';
 import * as jwt from 'jsonwebtoken';
 import { DataSource, Repository } from 'typeorm';
 
 import { SuperAdminData } from './data';
-import { User } from '../../entities/user.entity';
 
 @Injectable()
 export class SeedingService {
