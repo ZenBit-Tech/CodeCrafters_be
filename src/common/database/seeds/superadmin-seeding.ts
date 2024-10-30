@@ -4,16 +4,18 @@ import { AppModule } from 'app.module';
 import { SeedingService } from 'common/database/seeds/superadmin-seeding/seeding.service';
 
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule);
-
+  let app;
   try {
+    app = await NestFactory.createApplicationContext(AppModule);
     const seederService = app.get(SeedingService);
 
     await seederService.seed();
   } catch (error) {
     new Logger().error(error);
   } finally {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   }
 }
 
