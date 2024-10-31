@@ -1,10 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { SendEmailInterface } from 'common/types/interfaces';
 import * as nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-
-import { SendMailDto } from './dto/send-mail.dto';
 
 @Injectable()
 export class MailerService {
@@ -22,7 +21,7 @@ export class MailerService {
     });
   }
 
-  async sendEmail(newMailDto: SendMailDto): Promise<{ status: number; message: string }> {
+  async sendEmail(newMailDto: SendEmailInterface): Promise<{ status: number; message: string }> {
     const { from, recipients, subject, html } = newMailDto;
     const transport = this.mailTransport();
 

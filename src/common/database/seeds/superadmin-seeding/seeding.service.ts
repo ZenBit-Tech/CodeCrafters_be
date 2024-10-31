@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
-import { SendMailDto } from 'common/mailer/dto/send-mail.dto';
 import { MailerService } from 'common/mailer/mailer.service';
+import { SendEmailInterface } from 'common/types/interfaces';
 import * as jwt from 'jsonwebtoken';
 import { DataSource, Repository } from 'typeorm';
 
@@ -42,7 +42,7 @@ export class SeedingService {
         expiresIn: '1h',
       });
 
-      const mailDto: SendMailDto = {
+      const mailDto: SendEmailInterface = {
         from: { name: 'codecrafters', address: 'codecrafters@mail.com' },
         recipients: [{ name: superAdmin.full_name, address: superAdmin.email }],
         subject: 'invitation link',
