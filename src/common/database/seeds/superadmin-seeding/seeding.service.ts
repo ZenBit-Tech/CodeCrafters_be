@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
+import { SendMailDto } from 'common/mailer/dto/send-mail.dto';
 import { MailerService } from 'common/mailer/mailer.service';
 import * as jwt from 'jsonwebtoken';
 import { DataSource, Repository } from 'typeorm';
@@ -41,13 +42,14 @@ export class SeedingService {
         expiresIn: '1h',
       });
 
-      const mailDto = {
+      const mailDto: SendMailDto = {
         from: { name: 'codecrafters', address: 'codecrafters@mail.com' },
         recipients: [{ name: superAdmin.full_name, address: superAdmin.email }],
         subject: 'invitation link',
         html: `<a href="http://application-api?inviteToken=${superAdminToken}">invitation link</a>`,
         placeholderReplacements: {},
       };
+
       await this.smtpService.sendEmail(mailDto);
 
       await queryRunner.commitTransaction();

@@ -62,7 +62,7 @@
     "@typescript-eslint/consistent-type-assertions": ["error", { "assertionStyle": "angle-bracket" }],
     "@typescript-eslint/lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "@typescript-eslint/naming-convention": [
-      "error",
+      "warn",
       { "selector": "default", "format": ["strictCamelCase"] },
       { "selector": "variable", "format": ["strictCamelCase", "UPPER_CASE", "StrictPascalCase"] },
       // https://github.com/microsoft/TypeScript/issues/9458

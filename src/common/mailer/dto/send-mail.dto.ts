@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Address } from 'nodemailer/lib/mailer';
 
-export class CreateMailDto {
+export class SendMailDto {
   from?: Address;
 
   @IsNotEmpty()

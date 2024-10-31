@@ -2,21 +2,15 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
-import { Address } from 'nodemailer/lib/mailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-export interface MailDto {
-  from?: Address;
-  recipients: Address[];
-  subject: string;
-  html: string;
-  text?: string;
-  placeholderReplacements: Record<string, string>;
-}
+import { SendMailDto } from './dto/send-mail.dto';
 
 @Injectable()
 export class MailerService {
   constructor(private readonly configService: ConfigService) {}
-  mailTransport() {
+
+  mailTransport(): nodemailer.Transporter<SMTPTransport.SentMessageInfo, SMTPTransport.Options> {
     return nodemailer.createTransport({
       host: this.configService.getOrThrow<string>('MAIL_HOST'),
       port: this.configService.getOrThrow<number>('MAIL_PORT'),
@@ -28,9 +22,8 @@ export class MailerService {
     });
   }
 
-  async sendEmail(dto: MailDto) {
-    const { from, recipients, subject, html } = dto;
-
+  async sendEmail(newMailDto: SendMailDto): Promise<{ status: number; message: string }> {
+    const { from, recipients, subject, html } = newMailDto;
     const transport = this.mailTransport();
 
     const options: MailOptions = {
@@ -47,7 +40,7 @@ export class MailerService {
       await transport.sendMail(options);
       return { status: 200, message: 'Message was successfully sent' };
     } catch (error) {
-      return InternalServerErrorException;
+      throw new InternalServerErrorException();
     }
   }
 }
