@@ -18,6 +18,22 @@ export interface CustomerInterface {
   email: string;
 }
 
+export interface OrderInterface {
+  collection_date: Date;
+  status: OrderStatuses;
+  customer_name: string;
+  luggages: LuggageInterface[];
+}
+
+export interface LuggageInterface {
+  luggage_type: LuggageTypes;
+  luggage_weight: number;
+}
+
+export interface LuggageImgsInterface {
+  link: string;
+}
+
 export const customersData: CustomerInterface[] = [
   { full_name: 'Alice Johnson', phone_number: '+380-67-123-4567', email: 'alice.johnson@example.com' },
   { full_name: 'Bob Smith', phone_number: '+380-50-234-5678', email: 'bob.smith@example.com' },
@@ -30,18 +46,6 @@ export const customersData: CustomerInterface[] = [
   { full_name: 'Ian Lee', phone_number: '+380-67-901-2345', email: 'ian.lee@example.com' },
   { full_name: 'Julia Martinez', phone_number: '+380-50-012-3456', email: 'julia.martinez@example.com' },
 ];
-
-export interface OrderInterface {
-  collection_date: Date;
-  status: OrderStatuses;
-  customer_name: string;
-  luggages: LuggageInterface[];
-}
-
-export interface LuggageInterface {
-  luggage_type: LuggageTypes;
-  luggage_weight: number;
-}
 
 export const luggagesData: LuggageInterface[] = [
   { luggage_type: LuggageTypes.BIG, luggage_weight: 23 },
@@ -103,10 +107,6 @@ export const ordersData: OrderInterface[] = [
     luggages: [luggagesData[4]],
   },
 ];
-
-export interface LuggageImgsInterface {
-  link: string;
-}
 
 export const luggageImgsData: LuggageImgsInterface[] = [
   {

@@ -17,41 +17,37 @@ export class OrdersClientsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async seed() {
+  async seed(): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
+
     try {
       await queryRunner.connect();
-      await queryRunner.startTransaction();
-
-      // create company
-      const isCompanyExists = await queryRunner.manager.findOne(Company, { where: { name: companyData.name } });
-
+      const isCompanyExists = await this.companyRepo.findOne({ where: { name: companyData.name } });
       if (isCompanyExists) return;
 
-      const company: Company = this.companyRepo.create(companyData);
-      await queryRunner.manager.save(company);
+      const company = this.companyRepo.create(companyData);
+      const customers = customersData.map((customerData) => new Customer(customerData));
 
-      // create customers
-      const customers: Customer[] = customersData.map((customer) => new Customer(customer));
-      await queryRunner.manager.save(customers);
+      const orders = ordersData.map((orderData) => {
+        const customer = customers.find((cust) => cust.full_name === orderData.customer_name);
+        if (!customer) throw new InternalServerErrorException(`Order must have a valid customer`);
 
-      // create orders
-      const orders: Order[] = ordersData.map((order) => {
-        const currentCustomer: Customer | undefined = customers.find((customer) => customer.full_name === order.customer_name);
-
-        if (!currentCustomer) throw new InternalServerErrorException('order should have a customer');
+        const luggages = orderData.luggages.map(
+          (luggage) => new Luggage({ ...luggage, imgs: luggageImgsData.map((imgData) => new LuggageImages(imgData)) }),
+        );
 
         return new Order({
-          collection_date: order.collection_date,
-          status: order.status,
-          customer_id: currentCustomer,
+          collection_date: orderData.collection_date,
+          status: orderData.status,
+          customer_id: customer,
           company_id: company,
-          luggages: order.luggages.map(
-            (luggage) => new Luggage({ ...luggage, imgs: luggageImgsData.map((img) => new LuggageImages(img)) }),
-          ),
+          luggages,
         });
       });
 
+      await queryRunner.startTransaction();
+      await queryRunner.manager.save(company);
+      await queryRunner.manager.save(customers);
       await queryRunner.manager.save(orders);
 
       await queryRunner.commitTransaction();
