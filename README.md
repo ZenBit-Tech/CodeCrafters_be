@@ -32,32 +32,6 @@
 $ npm install
 ```
 
-## Env file example
-
-```
-MYSQL_ROOT_PASSWORD=randomrootpassword
-MYSQL_DATABASE=nestjs_typeorm
-MYSQL_HOST=127.0.0.1
-MYSQL_PORT=3306:3306
-MYSQL_USERNAME=root
-MYSQL_PASSWORD=randomrootpassword
-MYSQL_SYNCHRONIZE=true
-
-PORT=4000
-```
-
-## Guard rules
-
-### RolesGuard
-
-When you use the RolesGuard in your controller, apply the @SetMetadata('roles', [Roles.SUPERADMIN]) decorator to specify the required roles
-
-```TS
-  @Get()
-  @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.SUPERADMIN])
-```
-
 ## Running the app
 
 ```bash
@@ -69,6 +43,18 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+```
+
+## Guards
+
+### Roles guard
+
+When you use the RolesGuard in your controller, apply the @SetMetadata('roles', [Roles.SUPERADMIN]) decorator to specify the required roles
+
+```TS
+  @Get()
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
 ```
 
 ## Test
