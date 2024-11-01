@@ -22,17 +22,17 @@ export class OrdersClientsService {
 
     try {
       await queryRunner.connect();
-      const isCompanyExists = await this.companyRepo.findOne({ where: { name: companyData.name } });
+      const isCompanyExists: Company | null = await this.companyRepo.findOne({ where: { name: companyData.name } });
       if (isCompanyExists) return;
 
-      const company = this.companyRepo.create(companyData);
-      const customers = customersData.map((customerData) => new Customer(customerData));
+      const company: Company = this.companyRepo.create(companyData);
+      const customers: Customer[] = customersData.map((customerData) => new Customer(customerData));
 
-      const orders = ordersData.map((orderData) => {
-        const customer = customers.find((cust) => cust.full_name === orderData.customer_name);
+      const orders: Order[] = ordersData.map((orderData) => {
+        const customer: Customer | undefined = customers.find((cust) => cust.full_name === orderData.customer_name);
         if (!customer) throw new InternalServerErrorException(`Order must have a valid customer`);
 
-        const luggages = orderData.luggages.map(
+        const luggages: Luggage[] = orderData.luggages.map(
           (luggage) => new Luggage({ ...luggage, imgs: luggageImgsData.map((imgData) => new LuggageImages(imgData)) }),
         );
 
