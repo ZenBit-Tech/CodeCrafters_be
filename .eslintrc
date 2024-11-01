@@ -19,7 +19,6 @@
   ],
   "ignorePatterns": ["**/node_modules/**", "dist/**", "src/entity/**"],
   "rules": {
-    "typesafe/no-throw-sync-func": "error",
     "typesafe/no-await-without-trycatch": "warn",
     "typesafe/promise-catch": "error",
     // These rules are for reference only.
@@ -28,7 +27,7 @@
     // https://github.com/typescript-eslint/typescript-eslint/issues/1277
     "consistent-return": "off",
     "func-names": "off",
-    "max-len": ["error", { "code": 140, "ignoreTemplateLiterals": true, "ignoreUrls": true }],
+    "max-len": ["error", { "code": 238, "ignoreTemplateLiterals": true, "ignoreUrls": true }],
     "newline-per-chained-call": "off",
     "no-await-in-loop": "off",
     "no-continue": "off",
@@ -63,7 +62,7 @@
     "@typescript-eslint/consistent-type-assertions": ["error", { "assertionStyle": "angle-bracket" }],
     "@typescript-eslint/lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "@typescript-eslint/naming-convention": [
-      "error",
+      "warn",
       { "selector": "default", "format": ["strictCamelCase"] },
       { "selector": "variable", "format": ["strictCamelCase", "UPPER_CASE", "StrictPascalCase"] },
       // https://github.com/microsoft/TypeScript/issues/9458

@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Company } from 'common/database/entities/company.entity';
 import { Error } from 'common/types/interfaces';
 import { DeleteResult, EntityManager, Repository } from 'typeorm';
 
 import { CreateModuleExampleDto } from './dto/create-module-example.dto';
 import { UpdateModuleExampleDto } from './dto/update-module-example.dto';
-import { Company } from '../../common/database/entities/company.entity';
 
 @Injectable()
 export class ModuleExampleService {

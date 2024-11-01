@@ -18,7 +18,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prettier-watch": "npx onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "seed:superadmin": "ts-node -r tsconfig-paths/register src/common/database/seeds/superadmin-seeding.ts"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
@@ -35,6 +36,7 @@
     "class-validator": "^0.14.1",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.0",
+    "nodemailer": "^6.9.16",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.1",
@@ -50,6 +52,7 @@
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20.14.14",
+    "@types/nodemailer": "^6.4.16",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",

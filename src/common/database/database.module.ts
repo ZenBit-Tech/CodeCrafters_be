@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { SeedingModule } from './seeds/superadmin-seeding/seeding.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -17,6 +19,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       }),
       inject: [ConfigService],
     }),
+    SeedingModule,
   ],
 })
 export class DatabaseModule {}
