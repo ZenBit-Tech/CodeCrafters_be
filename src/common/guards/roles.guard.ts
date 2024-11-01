@@ -4,16 +4,6 @@ import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { Observable } from 'rxjs';
 
-/**
- *
- * use decorator @SetMetadata() below for applying the list of
- * required roles for endpoint 
- *   
- * @Get()
-   @UseGuards(RolesGuard)
-   @SetMetadata('roles', [Roles.SUPERADMIN])
- */
-
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}

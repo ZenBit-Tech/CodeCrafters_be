@@ -46,6 +46,18 @@ MYSQL_SYNCHRONIZE=true
 PORT=4000
 ```
 
+## Guard rules
+
+### RolesGuard
+
+When you use the RolesGuard in your controller, apply the @SetMetadata('roles', [Roles.SUPERADMIN]) decorator to specify the required roles
+
+```TS
+  @Get()
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
+```
+
 ## Running the app
 
 ```bash
