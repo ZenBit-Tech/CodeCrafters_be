@@ -15,6 +15,7 @@ import { MailerModule } from './common/mailer/mailer.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ModuleExampleModule } from './modules/module-example/module-example.module';
 import { UserModule } from './modules/user/user.module';
+import { CompanyModule } from 'modules/company/company.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UserModule } from './modules/user/user.module';
     MailerModule,
     AuthModule,
     UserModule,
+    CompanyModule,
   ],
   controllers: [],
   providers: [],
