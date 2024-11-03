@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Company } from 'common/database/entities/company.entity';
+import { RolesGuard } from 'common/guards/roles.guard';
 import { Error } from 'common/types/interfaces';
 import { DeleteResult } from 'typeorm';
 
@@ -22,6 +23,7 @@ export class ModuleExampleController {
   }
 
   @Get()
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Get all companies' })
   @ApiResponse({
     status: 200,

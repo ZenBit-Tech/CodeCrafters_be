@@ -45,6 +45,18 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Guards
+
+### Roles guard
+
+When you use the RolesGuard in your controller, apply the @SetMetadata('roles', [Roles.SUPERADMIN]) decorator to specify the required roles
+
+```TS
+  @Get()
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
+```
+
 ## Test
 
 ```bash
