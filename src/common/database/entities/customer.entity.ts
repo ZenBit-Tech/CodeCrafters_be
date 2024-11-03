@@ -12,7 +12,7 @@ export class Customer {
   phone_number: string;
 
   @Column({ nullable: false })
-  emial: string;
+  email: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

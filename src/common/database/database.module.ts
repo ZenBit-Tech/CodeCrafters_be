@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { OrdersClientsModule } from './seeds/orders-clients/orders-clients.module';
 import { SeedingModule } from './seeds/superadmin-seeding/seeding.module';
 
 @Module({
@@ -20,6 +21,7 @@ import { SeedingModule } from './seeds/superadmin-seeding/seeding.module';
       inject: [ConfigService],
     }),
     SeedingModule,
+    OrdersClientsModule,
   ],
 })
 export class DatabaseModule {}
