@@ -1,5 +1,6 @@
-import { Controller, Post, Patch, Param, Delete, Body, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Post, Patch, Param, Delete, Body, UseGuards, SetMetadata, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
+import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
 
@@ -23,6 +24,16 @@ export class AdminController {
   @ApiResponse({ status: 400, type: FailedResponse })
   async create(@Body() adminData: CreateAdminDto): Promise<{ status: number; message?: string; error?: unknown }> {
     return this.adminService.create(adminData);
+  }
+
+  @Get()
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
+  @ApiOperation({ summary: 'Get list of admins' })
+  @ApiResponse({ status: 200, type: [User] })
+  @ApiResponse({ status: 400, type: FailedResponse })
+  async getList(): Promise<User[] | { status: number; error?: unknown }> {
+    return this.adminService.getAll();
   }
 
   @Patch(':id')

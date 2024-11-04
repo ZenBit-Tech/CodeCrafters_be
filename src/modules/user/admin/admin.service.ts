@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
@@ -30,6 +30,14 @@ export class AdminService {
       return { status: 201, message: 'User created successfully' };
     } catch (error) {
       return { status: 500, error };
+    }
+  }
+
+  async getAll(): Promise<User[] | { status: number; error?: unknown }> {
+    try {
+      return await this.userRepo.find({ where: { role: Roles.ADMIN } });
+    } catch (error) {
+      return { status: 500, error: new InternalServerErrorException() };
     }
   }
 
