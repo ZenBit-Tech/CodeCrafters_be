@@ -1,5 +1,7 @@
-import { Controller, Post, Patch, Param, Delete, Body } from '@nestjs/common';
+import { Controller, Post, Patch, Param, Delete, Body, UseGuards, SetMetadata } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Roles } from 'common/enums/enums';
+import { RolesGuard } from 'common/guards/roles.guard';
 
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -14,6 +16,8 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
   @ApiOperation({ summary: 'Create admin' })
   @ApiResponse({ status: 201, type: SuccessResponse })
   @ApiResponse({ status: 400, type: FailedResponse })
@@ -22,6 +26,8 @@ export class AdminController {
   }
 
   @Patch(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
   @ApiOperation({ summary: 'Update admin' })
   @ApiResponse({ status: 200, type: SuccessResponse })
   @ApiResponse({ status: 400, type: FailedResponse })
@@ -30,6 +36,8 @@ export class AdminController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
   @ApiOperation({ summary: 'Delete admin' })
   @ApiResponse({ status: 200, type: SuccessResponse })
   @ApiResponse({ status: 400, type: FailedResponse })
