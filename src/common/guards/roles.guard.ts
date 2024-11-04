@@ -12,11 +12,11 @@ export class RolesGuard implements CanActivate {
     const requiredRoles: string[] = this.reflector.get<string[]>('roles', context.getHandler());
     const request: Request = context.switchToHttp().getRequest();
 
-    if (!(<{ token: string }>request.body).token) {
-      throw new UnauthorizedException('Auth token is missing in the request body');
+    if (!request.headers.authorization) {
+      throw new UnauthorizedException('Auth token is missing in the request headers');
     }
 
-    const decodedAccessToken = <{ role: string }>jwt.decode(<string>request.body.token);
+    const decodedAccessToken = <{ role: string }>jwt.decode(request.headers.authorization);
 
     if (decodedAccessToken.role) {
       return requiredRoles.some((role: string) => role === decodedAccessToken.role);
