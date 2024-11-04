@@ -1,5 +1,19 @@
-import { PartialType } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
-import { CreateAdminDto } from './create-admin.dto';
+export class UpdateAdminDto {
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  logo: string;
 
-export class UpdateAdminDto extends PartialType(CreateAdminDto) {}
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  full_name: string;
+
+  @Expose()
+  @IsString()
+  @IsEmail()
+  email: string;
+}
