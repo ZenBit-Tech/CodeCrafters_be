@@ -10,7 +10,7 @@ import { UpdateModuleExampleDto } from './dto/update-module-example.dto';
 import { ModuleExampleService } from './module-example.service';
 
 @ApiBearerAuth()
-@ApiTags('companies')
+@ApiTags('module-example')
 @Controller('module-example')
 export class ModuleExampleController {
   constructor(private readonly moduleExampleService: ModuleExampleService) {}

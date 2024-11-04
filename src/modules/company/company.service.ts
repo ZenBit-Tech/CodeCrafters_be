@@ -23,6 +23,15 @@ export class CompanyService {
     }
   }
 
+  async getList(): Promise<Company[]> {
+    try {
+      const companies = await this.companyRepo.find();
+      return await this.entityManager.save(companies);
+    } catch (error) {
+      throw new InternalServerErrorException('Internal server error');
+    }
+  }
+
   async update(id: number, updateCompanyDto: UpdateCompanyDto): Promise<{ status: number; message: string }> {
     try {
       const company: UpdateResult = await this.companyRepo.update(+id, updateCompanyDto);

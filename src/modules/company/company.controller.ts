@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Param, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, UseGuards, SetMetadata, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Company } from 'common/database/entities/company.entity';
 import { Roles } from 'common/enums/enums';
@@ -13,6 +13,15 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 @Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
+
+  @Get()
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
+  @ApiOperation({ summary: 'Get list of companies' })
+  @ApiResponse({ status: 200, type: [Company] })
+  async getAll() {
+    return this.companyService.getList();
+  }
 
   @Post()
   @UseGuards(RolesGuard)
