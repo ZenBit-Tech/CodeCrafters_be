@@ -19,7 +19,7 @@ export class CompanyController {
   @SetMetadata('roles', [Roles.SUPERADMIN])
   @ApiOperation({ summary: 'Get list of companies' })
   @ApiResponse({ status: 200, type: [Company] })
-  async getAll() {
+  async getAll(): Promise<Company[]> {
     return this.companyService.getList();
   }
 

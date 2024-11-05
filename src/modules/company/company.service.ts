@@ -25,8 +25,8 @@ export class CompanyService {
 
   async getList(): Promise<Company[]> {
     try {
-      const companies = await this.companyRepo.find();
-      return await this.entityManager.save(companies);
+      const companies: Company[] = await this.companyRepo.find();
+      return companies;
     } catch (error) {
       throw new InternalServerErrorException('Internal server error');
     }
@@ -34,7 +34,7 @@ export class CompanyService {
 
   async update(id: number, updateCompanyDto: UpdateCompanyDto): Promise<{ status: number; message: string }> {
     try {
-      const company: UpdateResult = await this.companyRepo.update(+id, updateCompanyDto);
+      const company: UpdateResult = await this.companyRepo.update(id, updateCompanyDto);
 
       if (company.affected === 0) throw new NotFoundException('There is no company with this id');
 
