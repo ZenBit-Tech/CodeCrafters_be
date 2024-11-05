@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagg
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
+import { ResponseInterface } from 'common/types/interfaces';
 
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -22,7 +23,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Create admin' })
   @ApiResponse({ status: 201, type: SuccessResponse })
   @ApiResponse({ status: 400, type: FailedResponse })
-  async create(@Body() adminData: CreateAdminDto): Promise<{ status: number; message?: string; error?: unknown }> {
+  async create(@Body() adminData: CreateAdminDto): Promise<ResponseInterface> {
     return this.adminService.create(adminData);
   }
 
@@ -32,7 +33,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Get list of admins' })
   @ApiResponse({ status: 200, type: [User] })
   @ApiResponse({ status: 400, type: FailedResponse })
-  async getList(): Promise<User[] | { status: number; error?: unknown }> {
+  async getList(): Promise<User[] | ResponseInterface> {
     return this.adminService.getAll();
   }
 
@@ -42,7 +43,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Update admin' })
   @ApiResponse({ status: 200, type: SuccessResponse })
   @ApiResponse({ status: 400, type: FailedResponse })
-  async update(@Param('id') id: string, @Body() adminData: UpdateAdminDto): Promise<{ status: number; message?: string; error?: unknown }> {
+  async update(@Param('id') id: string, @Body() adminData: UpdateAdminDto): Promise<ResponseInterface> {
     return this.adminService.update(+id, adminData);
   }
 
@@ -52,7 +53,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Delete admin' })
   @ApiResponse({ status: 200, type: SuccessResponse })
   @ApiResponse({ status: 400, type: FailedResponse })
-  async remove(@Param('id') id: string): Promise<{ status: number; message?: string; error?: unknown }> {
+  async remove(@Param('id') id: string): Promise<ResponseInterface> {
     return this.adminService.remove(+id);
   }
 }

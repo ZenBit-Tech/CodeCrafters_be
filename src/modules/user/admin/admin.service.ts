@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
+import { ResponseInterface } from 'common/types/interfaces';
 import { EntityManager, Repository } from 'typeorm';
 
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -18,7 +19,7 @@ export class AdminService {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async create(createAdminData: CreateAdminDto): Promise<{ status: number; message?: string; error?: unknown }> {
+  async create(createAdminData: CreateAdminDto): Promise<ResponseInterface> {
     try {
       if (createAdminData.role !== Roles.ADMIN) throw new BadRequestException('User should have admin role');
 
@@ -33,7 +34,7 @@ export class AdminService {
     }
   }
 
-  async getAll(): Promise<User[] | { status: number; error?: unknown }> {
+  async getAll(): Promise<User[] | ResponseInterface> {
     try {
       return await this.userRepo.find({ where: { role: Roles.ADMIN } });
     } catch (error) {
@@ -41,7 +42,7 @@ export class AdminService {
     }
   }
 
-  async update(id: number, updateAdmindata: UpdateAdminDto): Promise<{ status: number; message?: string; error?: unknown }> {
+  async update(id: number, updateAdmindata: UpdateAdminDto): Promise<ResponseInterface> {
     try {
       const updatedAdmin = await this.userRepo.update(+id, updateAdmindata);
 
@@ -53,7 +54,7 @@ export class AdminService {
     }
   }
 
-  async remove(id: number): Promise<{ status: number; message?: string; error?: unknown }> {
+  async remove(id: number): Promise<ResponseInterface> {
     try {
       const deletedAdmin = await this.userRepo.delete(id);
 
