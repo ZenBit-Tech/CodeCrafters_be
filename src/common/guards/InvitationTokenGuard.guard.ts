@@ -9,10 +9,10 @@ interface AuthRequestBody {
 @Injectable()
 export class InvitationTokenGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    const request = context.switchToHttp().getRequest<{ body: AuthRequestBody }>();
+    const request = context.switchToHttp().getRequest<{ query: AuthRequestBody }>();
 
-    if (!request.body.invitationToken) {
-      throw new UnauthorizedException('Invitation token is missing in the request body');
+    if (!request.query.invitationToken) {
+      throw new UnauthorizedException('Invitation token is missing in the query parameters');
     }
 
     const jwtSecret = process.env['JWT_SECRET'];
@@ -21,8 +21,8 @@ export class InvitationTokenGuard implements CanActivate {
     }
 
     try {
-      const isTokenValid = jwt.verify(request.body.invitationToken, jwtSecret);
-      const decoded = jwt.decode(request.body.invitationToken);
+      const isTokenValid = jwt.verify(request.query.invitationToken, jwtSecret);
+      const decoded = jwt.decode(request.query.invitationToken);
 
       if (!decoded || typeof decoded === 'string' || !('iat' in decoded) || !('exp' in decoded)) {
         throw new UnauthorizedException('Invalid token structure');
