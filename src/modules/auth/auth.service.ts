@@ -27,7 +27,11 @@ export class AuthService {
       if (decodedToken.role !== user.role) throw new Error();
 
       const secret: string = this.configService.getOrThrow('JWT_SECRET');
-      const token: string = jwt.sign({ fullName: user.full_name, email: user.email, role: user.role }, secret, { expiresIn: '12h' });
+      const token: string = jwt.sign(
+        { fullName: user.full_name, email: user.email, role: user.role, company_id: user.company_id.id },
+        secret,
+        { expiresIn: '12h' },
+      );
       return { token };
     } catch (error) {
       throw new BadRequestException("User with this email isn't exists");
