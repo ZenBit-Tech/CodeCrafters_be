@@ -15,7 +15,7 @@ export class Company {
   @ApiProperty({ example: 'https://company-logo-link', description: 'link to company logo' })
   logo: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   @ApiProperty({ example: 'company@text.mail', description: 'link to company logo' })
   email: string;
 

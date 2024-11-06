@@ -11,7 +11,7 @@ export class Customer {
   @Column({ nullable: false })
   phone_number: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   email: string;
 
   @CreateDateColumn({ type: 'timestamp' })

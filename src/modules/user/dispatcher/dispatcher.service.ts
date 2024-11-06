@@ -14,7 +14,7 @@ interface AccessTokenInterface extends jwt.Jwt {
   fullName: string;
   email: string;
   role: Roles;
-  company_id: number;
+  company_id: Company;
 }
 
 @Injectable()
@@ -32,7 +32,7 @@ export class DispatcherService {
       const company = await this.companyRepo.findOneByOrFail({ id: createDispatcherDto.company_id });
 
       const decodedToken = <AccessTokenInterface>jwt.decode(authorization);
-      if (company.id !== decodedToken.company_id) throw new BadRequestException("You doesn't work in this company");
+      if (company.id !== decodedToken.company_id.id) throw new BadRequestException("You doesn't work in this company");
 
       const dispatcher = this.userRepo.create({ ...createDispatcherDto, company_id: company });
       return await this.entityManager.save(dispatcher);
@@ -46,7 +46,7 @@ export class DispatcherService {
       const dispatcher = await this.userRepo.findOneByOrFail({ id });
 
       const decodedToken = <AccessTokenInterface>jwt.decode(authorization);
-      if (dispatcher.company_id.id !== decodedToken.company_id) throw new BadRequestException("You doesn't work in this company");
+      if (dispatcher.company_id.id !== decodedToken.company_id.id) throw new BadRequestException("You doesn't work in this company");
       return await this.userRepo.findOneByOrFail({ id });
     } catch (error) {
       throw new BadRequestException('There is no such dispatcher');
@@ -58,7 +58,7 @@ export class DispatcherService {
       const dispatcher = await this.userRepo.findOneByOrFail({ id });
 
       const decodedToken = <AccessTokenInterface>jwt.decode(authorization);
-      if (dispatcher.company_id.id !== decodedToken.company_id) throw new BadRequestException("You doesn't work in this company");
+      if (dispatcher.company_id.id !== decodedToken.company_id.id) throw new BadRequestException("You doesn't work in this company");
 
       await this.userRepo.update(id, { ...updateDispatcherDto });
       return { status: 200, message: `Dispatcher ${dispatcher.full_name} updated successfully` };
@@ -72,7 +72,7 @@ export class DispatcherService {
       const dispatcher = await this.userRepo.findOneByOrFail({ id });
 
       const decodedToken = <AccessTokenInterface>jwt.decode(authorization);
-      if (dispatcher.company_id.id !== decodedToken.company_id) throw new BadRequestException("You doesn't work in this company");
+      if (dispatcher.company_id.id !== decodedToken.company_id.id) throw new BadRequestException("You doesn't work in this company");
 
       await this.userRepo.delete(id);
       return { status: 200, message: `Dispatcher ${dispatcher.full_name} account deleted successfully` };
