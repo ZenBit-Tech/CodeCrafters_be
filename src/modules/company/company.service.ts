@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
+import { ResponseInterface } from 'common/types/interfaces';
 import { EntityManager, Repository, UpdateResult } from 'typeorm';
 
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -32,7 +33,7 @@ export class CompanyService {
     }
   }
 
-  async update(id: number, updateCompanyDto: UpdateCompanyDto): Promise<{ status: number; message: string }> {
+  async update(id: number, updateCompanyDto: UpdateCompanyDto): Promise<ResponseInterface> {
     try {
       const company: UpdateResult = await this.companyRepo.update(id, updateCompanyDto);
 

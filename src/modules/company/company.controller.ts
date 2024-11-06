@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Company } from 'common/database/entities/company.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
+import { ResponseInterface } from 'common/types/interfaces';
 
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -40,7 +41,7 @@ export class CompanyController {
     status: 200,
     type: Company,
   })
-  async update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto): Promise<{ status: number; message: string }> {
+  async update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto): Promise<ResponseInterface> {
     return this.companyService.update(+id, updateCompanyDto);
   }
 }
