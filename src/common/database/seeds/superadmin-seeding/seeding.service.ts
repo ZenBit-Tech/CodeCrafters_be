@@ -38,7 +38,7 @@ export class SeedingService {
         throw new Error('JWT secret is not defined');
       }
 
-      const superAdminToken: string = jwt.sign({ isLogginToken: true }, secret, {
+      const superAdminToken: string = jwt.sign({ isLogginToken: true, role: Roles.SUPERADMIN }, secret, {
         expiresIn: '1h',
       });
 
@@ -46,7 +46,7 @@ export class SeedingService {
         from: { name: 'codecrafters', address: 'codecrafters@mail.com' },
         recipients: [{ name: superAdmin.full_name, address: superAdmin.email }],
         subject: 'invitation link',
-        html: `<a href="http://application-api?inviteToken=${superAdminToken}">invitation link</a>`,
+        html: `<a href="http://localhost:5473?inviteToken=${superAdminToken}">invitation link</a>`,
         placeholderReplacements: {},
       };
 

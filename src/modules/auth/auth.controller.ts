@@ -18,7 +18,10 @@ export class AuthController {
   @ApiResponse({ status: 200, type: AuthResponseDto })
   @ApiResponse({ status: 400, type: BadRequestResponseDto })
   @UseGuards(InvitationTokenGuard)
-  async findOne(@Param('email') email: string, @Query() invitationToken: string): Promise<{ token: string } | BadRequestException> {
+  async findOne(
+    @Param('email') email: string,
+    @Query() { invitationToken }: { invitationToken: string },
+  ): Promise<{ token: string } | BadRequestException> {
     if (isEmail(email)) {
       return this.authService.authByEmail(email, invitationToken);
     }

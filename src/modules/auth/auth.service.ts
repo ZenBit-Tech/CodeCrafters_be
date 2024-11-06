@@ -22,7 +22,7 @@ export class AuthService {
     try {
       const user: User = await this.userRepo.findOneOrFail({ where: { email } });
 
-      const decodedToken = <InviteTokenPayload>jwt.decode(invitationToken, this.configService.getOrThrow('JWT_SECRET'));
+      const decodedToken = <InviteTokenPayload>jwt.decode(invitationToken);
 
       if (decodedToken.role !== user.role) throw new Error();
 
