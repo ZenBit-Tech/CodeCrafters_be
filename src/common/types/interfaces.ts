@@ -14,3 +14,9 @@ export interface SendEmailInterface {
   text?: string;
   placeholderReplacements: Record<string, string>;
 }
+
+export interface ResponseInterface {
+  status: number;
+  message?: string;
+  error?: unknown;
+}

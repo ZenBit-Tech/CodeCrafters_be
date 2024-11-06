@@ -14,6 +14,7 @@ import { DatabaseModule } from './common/database/database.module';
 import { MailerModule } from './common/mailer/mailer.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ModuleExampleModule } from './modules/module-example/module-example.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ModuleExampleModule } from './modules/module-example/module-example.mod
     ModuleExampleModule,
     MailerModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
