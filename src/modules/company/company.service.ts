@@ -1,6 +1,9 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
+import { createCompanyInvitationMail } from 'common/helpers/createEmailTemplates';
+import { MailerService } from 'common/mailer/mailer.service';
 import { ResponseInterface } from 'common/types/interfaces';
 import { EntityManager, Repository, UpdateResult } from 'typeorm';
 
@@ -13,11 +16,22 @@ export class CompanyService {
     @InjectRepository(Company)
     private readonly companyRepo: Repository<Company>,
     private readonly entityManager: EntityManager,
+    private readonly smtpService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
     try {
       const company: Company = this.companyRepo.create(createCompanyDto);
+
+      await this.smtpService.sendEmail({
+        from: { name: this.configService.getOrThrow('APP_NAME'), address: this.configService.getOrThrow('DEFAULT_EMAIL_FROM') },
+        recipients: [{ name: createCompanyDto.name, address: createCompanyDto.email }],
+        subject: 'Invitation Link',
+        html: createCompanyInvitationMail(createCompanyDto.name),
+        placeholderReplacements: {},
+      });
+
       return await this.entityManager.save(company);
     } catch (error) {
       throw new InternalServerErrorException('Internal server error');
