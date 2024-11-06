@@ -9,6 +9,7 @@ import { Notification } from 'common/database/entities/notification.entity';
 import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
+import { CompanyModule } from 'modules/company/company.module';
 
 import { DatabaseModule } from './common/database/database.module';
 import { MailerModule } from './common/mailer/mailer.module';
@@ -25,6 +26,7 @@ import { UserModule } from './modules/user/user.module';
     MailerModule,
     AuthModule,
     UserModule,
+    CompanyModule,
   ],
   controllers: [],
   providers: [],
