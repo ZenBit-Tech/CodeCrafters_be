@@ -1,9 +1,13 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
+import { createUserInvitationMail } from 'common/helpers/createEmailTemplates';
+import { MailerService } from 'common/mailer/mailer.service';
 import { ResponseInterface } from 'common/types/interfaces';
+import * as jwt from 'jsonwebtoken';
 import { EntityManager, Repository } from 'typeorm';
 
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -17,6 +21,8 @@ export class AdminService {
     @InjectRepository(Company)
     private readonly companyRepo: Repository<Company>,
     private readonly entityManager: EntityManager,
+    private readonly smtpService: MailerService,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(createAdminData: CreateAdminDto): Promise<ResponseInterface> {
@@ -26,7 +32,18 @@ export class AdminService {
       const company: Company | null = await this.companyRepo.findOneOrFail({ where: { id: createAdminData.company_id } });
 
       const admin = this.userRepo.create({ ...createAdminData, company_id: company });
+
       await this.entityManager.save(admin);
+
+      const invitationToken: string = jwt.sign({ ...admin }, this.configService.getOrThrow('JWT_SECRET'));
+
+      await this.smtpService.sendEmail({
+        from: { name: this.configService.getOrThrow('APP_NAME'), address: this.configService.getOrThrow('DEFAULT_EMAIL_FROM') },
+        recipients: [{ name: createAdminData.full_name, address: createAdminData.email }],
+        subject: 'Invitation Link',
+        html: createUserInvitationMail({ companyName: company.name, username: createAdminData.full_name, token: invitationToken }),
+        placeholderReplacements: {},
+      });
 
       return { status: 201, message: 'User created successfully' };
     } catch (error) {
