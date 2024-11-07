@@ -46,7 +46,7 @@ export class SeedingService {
         from: { name: 'codecrafters', address: 'codecrafters@mail.com' },
         recipients: [{ name: superAdmin.full_name, address: superAdmin.email }],
         subject: 'invitation link',
-        html: `<a href="http://localhost:5473?inviteToken=${superAdminToken}">invitation link</a>`,
+        html: `<a href="${this.configService.getOrThrow('FE_LINK')}?inviteToken=${superAdminToken}">invitation link</a>`,
         placeholderReplacements: {},
       };
 
