@@ -17,7 +17,7 @@ export class AuthService {
     private readonly smtpService: MailerService,
   ) {}
 
-  async authByEmail(email: string): Promise<{ token: string } | BadRequestException> {
+  async authByEmail(email: string): Promise<{ status: number; message: string } | BadRequestException> {
     try {
       const user: User = await this.userRepo.findOneOrFail({ where: { email } });
 
@@ -36,7 +36,7 @@ export class AuthService {
         placeholderReplacements: {},
       });
 
-      return { token };
+      return { status: 200, message: 'check your email' };
     } catch (error) {
       throw new BadRequestException("User with this email isn't exists");
     }

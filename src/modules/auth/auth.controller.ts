@@ -18,7 +18,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get token by email' })
   @ApiResponse({ status: 200, type: AuthResponseDto })
   @ApiResponse({ status: 400, type: BadRequestResponseDto })
-  async findOne(@Param('email') email: string): Promise<{ token: string } | BadRequestException> {
+  async findOne(@Param('email') email: string): Promise<{ status: number; message: string } | BadRequestException> {
     if (isEmail(email)) {
       return this.authService.authByEmail(email);
     }
