@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'common/database/entities/user.entity';
+import { Roles } from 'common/enums/enums';
 import { createUserInvitationMail } from 'common/helpers/createEmailTemplates';
 import { MailerService } from 'common/mailer/mailer.service';
 import * as jwt from 'jsonwebtoken';
@@ -39,5 +40,9 @@ export class AuthService {
     } catch (error) {
       throw new BadRequestException("User with this email isn't exists");
     }
+  }
+
+  tokenValidation(accessToken: string, role: Roles): { token: string; role: Roles } {
+    return { token: accessToken, role };
   }
 }

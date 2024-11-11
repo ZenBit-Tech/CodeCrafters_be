@@ -1,6 +1,8 @@
-import { BadRequestException, Controller, Get, Param } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Headers, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { isEmail } from 'class-validator';
+import { Roles } from 'common/enums/enums';
+import { AuthGuard } from 'common/guards/auth.guard';
 
 import { AuthService } from './auth.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
@@ -22,5 +24,11 @@ export class AuthController {
     }
 
     throw new BadRequestException("String isn't email");
+  }
+
+  @Get('')
+  @UseGuards(AuthGuard)
+  validateAccessToken(@Headers('role') role: Roles, @Headers('authorization') authorization: string): { token: string; role: Roles } {
+    return this.authService.tokenValidation(authorization, role);
   }
 }
