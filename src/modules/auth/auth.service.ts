@@ -23,7 +23,7 @@ export class AuthService {
 
       const secret: string = this.configService.getOrThrow('JWT_SECRET');
       const token: string = jwt.sign(
-        { fullName: user.full_name, email: user.email, role: user.role, company_id: user.company_id.id },
+        { fullName: user.full_name, email: user.email, role: user.role, company_id: user.company_id },
         secret,
         { expiresIn: '24h' },
       );
