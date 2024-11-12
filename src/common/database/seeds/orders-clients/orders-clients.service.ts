@@ -29,8 +29,8 @@ export class OrdersClientsService {
       const customers: Customer[] = customersData.map((customerData) => new Customer(customerData));
 
       const orders: Order[] = ordersData.map((orderData) => {
-        const customer: Customer | undefined = customers.find((cust) => cust.full_name === orderData.customer_name);
-        if (!customer) throw new InternalServerErrorException(`Order must have a valid customer`);
+        const foundedCustomer: Customer | undefined = customers.find((customer) => customer.full_name === orderData.customer_name);
+        if (!foundedCustomer) throw new InternalServerErrorException(`Order must have a valid customer`);
 
         const luggages: Luggage[] = orderData.luggages.map(
           (luggage) => new Luggage({ ...luggage, imgs: luggageImgsData.map((imgData) => new LuggageImages(imgData)) }),
@@ -39,8 +39,8 @@ export class OrdersClientsService {
         return new Order({
           collection_date: orderData.collection_date,
           status: orderData.status,
-          customer_id: customer,
-          company_id: company,
+          customer: foundedCustomer,
+          company,
           luggages,
         });
       });

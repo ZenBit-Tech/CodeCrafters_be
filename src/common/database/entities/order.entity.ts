@@ -19,18 +19,17 @@ export class Order {
 
   @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true })
   @JoinColumn()
-  customer_id: Customer;
+  customer: Customer;
 
   @ManyToOne(() => Route, (route) => route.id, { cascade: true, eager: true })
   @JoinColumn()
-  route_id: Route;
+  route: Route;
 
   @ManyToOne(() => Company, (company) => company.id, { cascade: true, eager: true })
   @JoinColumn()
-  company_id: Company;
+  company: Company;
 
-  @OneToMany(() => Luggage, (luggage) => luggage.id, { cascade: true, eager: true })
-  @JoinColumn()
+  @OneToMany(() => Luggage, (luggage) => luggage.order, { cascade: true })
   luggages: Luggage[];
 
   @CreateDateColumn({ type: 'timestamp' })

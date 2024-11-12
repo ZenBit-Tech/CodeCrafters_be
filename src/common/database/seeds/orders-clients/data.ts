@@ -19,6 +19,7 @@ export interface CustomerInterface {
 }
 
 export interface OrderInterface {
+  id?: number;
   collection_date: Date;
   status: OrderStatuses;
   customer_name: string;
@@ -56,50 +57,140 @@ export const luggagesData: LuggageInterface[] = [
 ];
 
 export const ordersData: OrderInterface[] = [
-  { collection_date: new Date('2024-11-01'), status: OrderStatuses.AT_RISK, customer_name: 'Alice Johnson', luggages: [luggagesData[0]] },
+  {
+    collection_date: new Date('2024-11-01'),
+    status: OrderStatuses.AT_RISK,
+    customer_name: 'Alice Johnson',
+    luggages: [luggagesData[0], luggagesData[1]],
+  },
   { collection_date: new Date('2024-11-02'), status: OrderStatuses.COMPLETED, customer_name: 'Bob Smith', luggages: [luggagesData[1]] },
-  { collection_date: new Date('2024-11-03'), status: OrderStatuses.AT_RISK, customer_name: 'Charlie Brown', luggages: [luggagesData[2]] },
-  { collection_date: new Date('2024-11-04'), status: OrderStatuses.NOT_ARRIVED, customer_name: 'Daisy Green', luggages: [luggagesData[3]] },
-  { collection_date: new Date('2024-11-05'), status: OrderStatuses.FAILED, customer_name: 'Evan Black', luggages: [luggagesData[4]] },
+  {
+    collection_date: new Date('2024-11-03'),
+    status: OrderStatuses.AT_RISK,
+    customer_name: 'Charlie Brown',
+    luggages: [luggagesData[2], luggagesData[0]],
+  },
+  {
+    collection_date: new Date('2024-11-04'),
+    status: OrderStatuses.NOT_ARRIVED,
+    customer_name: 'Daisy Green',
+    luggages: [luggagesData[3], luggagesData[1], luggagesData[0]],
+  },
+  {
+    collection_date: new Date('2024-11-05'),
+    status: OrderStatuses.FAILED,
+    customer_name: 'Evan Black',
+    luggages: [luggagesData[4], luggagesData[2]],
+  },
   { collection_date: new Date('2024-11-06'), status: OrderStatuses.UPCOMING, customer_name: 'Fiona White', luggages: [luggagesData[0]] },
-  { collection_date: new Date('2024-11-07'), status: OrderStatuses.UPCOMING, customer_name: 'George Harris', luggages: [luggagesData[1]] },
+  {
+    collection_date: new Date('2024-11-07'),
+    status: OrderStatuses.UPCOMING,
+    customer_name: 'George Harris',
+    luggages: [luggagesData[1], luggagesData[2]],
+  },
   {
     collection_date: new Date('2024-11-08'),
     status: OrderStatuses.NOT_ARRIVED,
     customer_name: 'Hannah Clark',
     luggages: [luggagesData[2]],
   },
-  { collection_date: new Date('2024-11-09'), status: OrderStatuses.UPCOMING, customer_name: 'Ian Lee', luggages: [luggagesData[3]] },
+  {
+    collection_date: new Date('2024-11-09'),
+    status: OrderStatuses.UPCOMING,
+    customer_name: 'Ian Lee',
+    luggages: [luggagesData[3], luggagesData[4], luggagesData[1]],
+  },
   {
     collection_date: new Date('2024-11-10'),
     status: OrderStatuses.NOT_ARRIVED,
     customer_name: 'Julia Martinez',
     luggages: [luggagesData[4]],
   },
-  { collection_date: new Date('2024-11-11'), status: OrderStatuses.FAILED, customer_name: 'Alice Johnson', luggages: [luggagesData[0]] },
-  { collection_date: new Date('2024-11-12'), status: OrderStatuses.NOT_ARRIVED, customer_name: 'Bob Smith', luggages: [luggagesData[1]] },
-  { collection_date: new Date('2024-11-13'), status: OrderStatuses.UPCOMING, customer_name: 'Charlie Brown', luggages: [luggagesData[2]] },
+  {
+    collection_date: new Date('2024-11-11'),
+    status: OrderStatuses.FAILED,
+    customer_name: 'Alice Johnson',
+    luggages: [luggagesData[0], luggagesData[1]],
+  },
+  {
+    collection_date: new Date('2024-11-12'),
+    status: OrderStatuses.NOT_ARRIVED,
+    customer_name: 'Bob Smith',
+    luggages: [luggagesData[1], luggagesData[0]],
+  },
+  {
+    collection_date: new Date('2024-11-13'),
+    status: OrderStatuses.UPCOMING,
+    customer_name: 'Charlie Brown',
+    luggages: [luggagesData[2], luggagesData[4]],
+  },
   { collection_date: new Date('2024-11-14'), status: OrderStatuses.UPCOMING, customer_name: 'Daisy Green', luggages: [luggagesData[3]] },
-  { collection_date: new Date('2024-11-15'), status: OrderStatuses.AT_RISK, customer_name: 'Evan Black', luggages: [luggagesData[4]] },
+  {
+    collection_date: new Date('2024-11-15'),
+    status: OrderStatuses.AT_RISK,
+    customer_name: 'Evan Black',
+    luggages: [luggagesData[4], luggagesData[2], luggagesData[0]],
+  },
   { collection_date: new Date('2024-11-16'), status: OrderStatuses.UPCOMING, customer_name: 'Fiona White', luggages: [luggagesData[0]] },
-  { collection_date: new Date('2024-11-17'), status: OrderStatuses.UPCOMING, customer_name: 'George Harris', luggages: [luggagesData[1]] },
-  { collection_date: new Date('2024-11-18'), status: OrderStatuses.UPCOMING, customer_name: 'Hannah Clark', luggages: [luggagesData[2]] },
+  {
+    collection_date: new Date('2024-11-17'),
+    status: OrderStatuses.UPCOMING,
+    customer_name: 'George Harris',
+    luggages: [luggagesData[1], luggagesData[3]],
+  },
+  {
+    collection_date: new Date('2024-11-18'),
+    status: OrderStatuses.UPCOMING,
+    customer_name: 'Hannah Clark',
+    luggages: [luggagesData[2], luggagesData[0]],
+  },
   { collection_date: new Date('2024-11-19'), status: OrderStatuses.UPCOMING, customer_name: 'Ian Lee', luggages: [luggagesData[3]] },
   {
     collection_date: new Date('2024-11-20'),
     status: OrderStatuses.NOT_ARRIVED,
     customer_name: 'Julia Martinez',
-    luggages: [luggagesData[4]],
+    luggages: [luggagesData[4], luggagesData[1]],
   },
-  { collection_date: new Date('2024-11-21'), status: OrderStatuses.AT_RISK, customer_name: 'Alice Johnson', luggages: [luggagesData[0]] },
+  {
+    collection_date: new Date('2024-11-21'),
+    status: OrderStatuses.AT_RISK,
+    customer_name: 'Alice Johnson',
+    luggages: [luggagesData[0], luggagesData[3]],
+  },
   { collection_date: new Date('2024-11-22'), status: OrderStatuses.UPCOMING, customer_name: 'Bob Smith', luggages: [luggagesData[1]] },
-  { collection_date: new Date('2024-11-23'), status: OrderStatuses.UPCOMING, customer_name: 'Charlie Brown', luggages: [luggagesData[2]] },
-  { collection_date: new Date('2024-11-24'), status: OrderStatuses.UPCOMING, customer_name: 'Daisy Green', luggages: [luggagesData[3]] },
+  {
+    collection_date: new Date('2024-11-23'),
+    status: OrderStatuses.UPCOMING,
+    customer_name: 'Charlie Brown',
+    luggages: [luggagesData[2], luggagesData[4]],
+  },
+  {
+    collection_date: new Date('2024-11-24'),
+    status: OrderStatuses.UPCOMING,
+    customer_name: 'Daisy Green',
+    luggages: [luggagesData[3], luggagesData[1]],
+  },
   { collection_date: new Date('2024-11-25'), status: OrderStatuses.AT_RISK, customer_name: 'Evan Black', luggages: [luggagesData[4]] },
-  { collection_date: new Date('2024-11-26'), status: OrderStatuses.FAILED, customer_name: 'Fiona White', luggages: [luggagesData[0]] },
+  {
+    collection_date: new Date('2024-11-26'),
+    status: OrderStatuses.FAILED,
+    customer_name: 'Fiona White',
+    luggages: [luggagesData[0], luggagesData[2], luggagesData[4]],
+  },
   { collection_date: new Date('2024-11-27'), status: OrderStatuses.AT_RISK, customer_name: 'George Harris', luggages: [luggagesData[1]] },
-  { collection_date: new Date('2024-11-28'), status: OrderStatuses.COMPLETED, customer_name: 'Hannah Clark', luggages: [luggagesData[2]] },
-  { collection_date: new Date('2024-11-29'), status: OrderStatuses.UPCOMING, customer_name: 'Ian Lee', luggages: [luggagesData[3]] },
+  {
+    collection_date: new Date('2024-11-28'),
+    status: OrderStatuses.COMPLETED,
+    customer_name: 'Hannah Clark',
+    luggages: [luggagesData[2], luggagesData[0]],
+  },
+  {
+    collection_date: new Date('2024-11-29'),
+    status: OrderStatuses.UPCOMING,
+    customer_name: 'Ian Lee',
+    luggages: [luggagesData[3], luggagesData[1]],
+  },
   {
     collection_date: new Date('2024-11-30'),
     status: OrderStatuses.COMPLETED,

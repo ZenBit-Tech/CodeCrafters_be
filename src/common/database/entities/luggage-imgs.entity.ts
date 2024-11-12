@@ -1,4 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
+import { Luggage } from './luggage.entity';
 
 @Entity()
 export class LuggageImages {
@@ -7,6 +9,9 @@ export class LuggageImages {
 
   @Column({ nullable: false })
   link: string;
+
+  @ManyToOne(() => Luggage, (luggage) => luggage.imgs)
+  luggage: Luggage;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

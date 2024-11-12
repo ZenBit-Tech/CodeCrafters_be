@@ -1,8 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Order } from 'common/database/entities/order.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class OrdersService {
-  findAll() {
-    return `This action returns all orders`;
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+  ) {}
+
+  async findAll(): Promise<Order[]> {
+    try {
+      return await this.orderRepository.find({ relations: ['luggages'] });
+    } catch (error) {
+      throw new InternalServerErrorException('Internal server error');
+    }
   }
 }
