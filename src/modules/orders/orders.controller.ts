@@ -16,7 +16,6 @@ export class OrdersController {
   @ApiOperation({ summary: 'Retrieve a list of orders with filtering, sorting, and pagination' })
   @ApiQuery({ name: 'sort_by', description: 'Sorting criteria in JSON format', example: '{"collection_date":"ASC"}' })
   @ApiQuery({ name: 'filter_by', description: 'Filter orders by status', example: 'COMPLETED' })
-  @ApiQuery({ name: 'search', description: 'Search term for fields like collection_address, customer name, etc.', example: 'Alice' })
   @ApiQuery({ name: 'page', description: 'Page number for pagination', example: 1 })
   @ApiQuery({ name: 'company_id', description: 'ID of the company for filtering orders', example: 1 })
   @ApiResponse({
