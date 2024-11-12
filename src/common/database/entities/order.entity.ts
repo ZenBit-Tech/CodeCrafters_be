@@ -15,6 +15,9 @@ export class Order {
   collection_date: Date;
 
   @Column({ nullable: false })
+  collection_address: string;
+
+  @Column({ nullable: false })
   status: OrderStatuses;
 
   @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true })
