@@ -1,9 +1,9 @@
 import { OrderStatuses } from 'common/enums/enums';
 
 export interface OrderQueryParams {
-  sort_by: string;
-  filter_by: OrderStatuses;
+  sortBy: string;
+  filterBy: OrderStatuses;
   search: string;
   page: number;
-  company_id: number;
+  companyId: number;
 }

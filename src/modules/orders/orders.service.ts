@@ -13,20 +13,15 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
   ) {}
 
-  async findAll({
-    sort_by,
-    filter_by,
-    page,
-    company_id,
-  }: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
+  async findAll({ sortBy, filterBy, page, companyId }: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
     const findSettings: FindManyOptions<Order> = {
-      order: { ...(<Record<string, string>>JSON.parse(sort_by)) },
+      order: { ...(<Record<string, string>>JSON.parse(sortBy)) },
       skip: (page - 1) * ORDER_PAGE_LENGTH,
       take: ORDER_PAGE_LENGTH,
       relations: ['luggages'],
       where: {
-        status: filter_by,
-        company: { id: company_id },
+        status: filterBy,
+        company: { id: companyId },
       },
     };
 
