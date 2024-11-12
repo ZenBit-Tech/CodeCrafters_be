@@ -7,6 +7,7 @@ import { AuthGuard } from 'common/guards/auth.guard';
 import { AuthService } from './auth.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { BadRequestResponseDto } from './dto/bad-request.dto';
+import { ValidateResponse } from './dto/validate-response.dto';
 
 @ApiBearerAuth()
 @ApiTags('auth')
@@ -28,6 +29,9 @@ export class AuthController {
 
   @Get('')
   @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Validate token' })
+  @ApiResponse({ status: 200, type: ValidateResponse })
+  @ApiResponse({ status: 400, type: BadRequestResponseDto })
   validateAccessToken(@Headers('role') role: Roles, @Headers('authorization') authorization: string): { token: string; role: Roles } {
     return this.authService.tokenValidation(authorization, role);
   }
