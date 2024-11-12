@@ -1,11 +1,12 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { createCompanyInvitationMail } from 'common/helpers/createEmailTemplates';
 import { MailerService } from 'common/mailer/mailer.service';
 import { ResponseInterface } from 'common/types/interfaces';
 import { EntityManager, Repository, UpdateResult } from 'typeorm';
+
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -38,12 +39,30 @@ export class CompanyService {
     }
   }
 
-  async getList(): Promise<Company[]> {
+  async getList(
+    page: number = 1,
+    pageSize: number = 10,
+    searchTerm?: string,
+    sortBy: string = 'name',
+    sortOrder: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<{ data: Company[]; total: number }> {
     try {
-      const companies: Company[] = await this.companyRepo.find();
-      return companies;
+      const query = this.companyRepo.createQueryBuilder('company');
+
+      if (searchTerm) {
+        query.where('company.name LIKE :searchTerm', {
+          searchTerm: `%${searchTerm}%`,
+        });
+      }
+
+      query.orderBy(`company.${sortBy}`, sortOrder);
+
+      query.skip((page - 1) * pageSize).take(pageSize);
+
+      const [data, total] = await query.getManyAndCount();
+      return { data, total };
     } catch (error) {
-      throw new InternalServerErrorException('Internal server error');
+      throw new InternalServerErrorException('Failed to get company list');
     }
   }
 
