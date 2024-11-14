@@ -1,4 +1,0 @@
-export const TOKEN_EXAMPLE =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmdWxsTmFtZSI6IlN1cGVyIEFkbWluIiwiZW1haWwiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNzMwMjE4MjM4LCJleHAiOjE3MzAyNjE0Mzh9.FEIULecy0FY7aJ5RnAYKErFWGcEHFpIM9AOWiqVwsLQ';
-
-export const EMAIL_EXAMPLE = 'jogn.dispatcher@gmail.com';
