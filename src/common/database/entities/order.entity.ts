@@ -20,6 +20,7 @@ export class Order {
   @Column({ nullable: false })
   status: OrderStatuses;
 
+  @Column({ nullable: false })
   @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true })
   @JoinColumn()
   customer: Customer;
