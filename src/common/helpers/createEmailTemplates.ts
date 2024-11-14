@@ -4,7 +4,7 @@ export const createUserInvitationMail = ({ companyName, username, token }: { com
   Dear ${username},Your account has been successfully registered! <br>
   We warmly welcome you to ${companyName}!<br><br>
   
-  Log in to ${companyName} by clicking the <a href='${process.env['FE_LINK']}?inviteToken=${token}'>link</a><br><br>
+  Log in to ${companyName} by clicking the <a href='${process.env['FE_LINK']}?accessToken=${token}'>sign in</a><br><br>
   
   If you have any queries or require assistance during the setup process, <br>
   please do not hesitate to reply to this email. We are always available to assist you.<br><br>
