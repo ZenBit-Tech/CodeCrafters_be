@@ -19,7 +19,6 @@ export interface CustomerInterface {
 }
 
 export interface OrderInterface {
-  id?: number;
   collection_date: Date;
   status: OrderStatuses;
   collection_address: string;
