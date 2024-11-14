@@ -1,7 +1,8 @@
 import { LuggageTypes } from 'common/enums/enums';
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { LuggageImages } from './luggage-imgs.entity';
+import { Order } from './order.entity';
 
 @Entity()
 export class Luggage {
@@ -14,9 +15,11 @@ export class Luggage {
   @Column({ nullable: false })
   luggage_weight: number;
 
-  @OneToMany(() => LuggageImages, (luggageImgs) => luggageImgs.id, { cascade: true, eager: true })
-  @JoinColumn()
+  @OneToMany(() => LuggageImages, (luggageImg) => luggageImg.luggage, { cascade: true, eager: true })
   imgs: LuggageImages[];
+
+  @ManyToOne(() => Order, (order) => order.luggages)
+  order: Order;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
