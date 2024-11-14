@@ -20,8 +20,7 @@ export class Order {
   @Column({ nullable: false })
   status: OrderStatuses;
 
-  @Column({ nullable: false })
-  @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true })
+  @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true, nullable: false })
   @JoinColumn()
   customer: Customer;
 
