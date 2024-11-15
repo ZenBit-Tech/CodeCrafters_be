@@ -15,6 +15,12 @@ export class Order {
   collection_date: Date;
 
   @Column({ nullable: false })
+  collection_time_start: Date;
+
+  @Column({ nullable: false })
+  collection_time_end: Date;
+
+  @Column({ nullable: false })
   collection_address: string;
 
   @Column({ nullable: false })

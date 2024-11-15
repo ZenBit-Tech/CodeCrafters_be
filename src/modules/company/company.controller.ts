@@ -1,10 +1,9 @@
+import { Body, Controller, Get, Param, Patch, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Company } from 'common/database/entities/company.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
 import { ResponseInterface } from 'common/types/interfaces';
-
-import { Body, Controller, Get, Param, Patch, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -22,10 +21,10 @@ export class CompanyController {
   @ApiOperation({ summary: 'Get list of companies' })
   @ApiResponse({ status: 200, type: [Company] })
   async getAll(
-    @Query('page') page: number = 1,
-    @Query('pageSize') pageSize: number = 10,
+    @Query('page') page = 1,
+    @Query('pageSize') pageSize = 10,
     @Query('searchTerm') searchTerm?: string,
-    @Query('sortBy') sortBy: string = 'name',
+    @Query('sortBy') sortBy = 'name',
     @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC',
   ): Promise<{ data: Company[]; total: number }> {
     return this.companyService.getList(page, pageSize, searchTerm, sortBy, sortOrder);

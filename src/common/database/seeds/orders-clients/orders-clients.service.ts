@@ -37,6 +37,9 @@ export class OrdersClientsService {
 
         return new Order({
           collection_date: orderData.collection_date,
+          collection_time_start: orderData.collection_time_start,
+          collection_time_end: orderData.collection_time_end,
+          collection_address: orderData.collection_address,
           status: orderData.status,
           customer: foundedCustomer,
           company,

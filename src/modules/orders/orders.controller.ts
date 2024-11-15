@@ -1,6 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
+import { Roles } from 'common/enums/enums';
+import { RolesGuard } from 'common/guards/roles.guard';
 import { FailedResponse } from 'common/types/failed-response.dto';
 
 import { OrdersResponse } from './dto/response.dto';
@@ -13,6 +15,8 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
   @ApiOperation({ summary: 'Retrieve a list of orders with filtering, sorting, and pagination' })
   @ApiQuery({ name: 'sort_by', description: 'Sorting criteria in JSON format', example: '{"collection_date":"ASC"}' })
   @ApiQuery({ name: 'filter_by', description: 'Filter orders by status', example: 'COMPLETED' })
