@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
+import { OrderStatuses } from 'common/enums/enums';
 import { FindManyOptions, Repository } from 'typeorm';
 
 import { OrderQueryParams } from './types';
@@ -20,7 +21,7 @@ export class OrdersService {
       take: ORDER_PAGE_LENGTH,
       relations: ['luggages'],
       where: {
-        status: filterBy,
+        status: OrderStatuses[filterBy],
         company: { id: companyId },
       },
     };

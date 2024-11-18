@@ -2,7 +2,7 @@ import { OrderStatuses } from 'common/enums/enums';
 
 export interface OrderQueryParams {
   sortBy: string;
-  filterBy: OrderStatuses;
+  filterBy: keyof typeof OrderStatuses;
   search: string;
   page: number;
   companyId: number;

@@ -20,6 +20,8 @@ export interface CustomerInterface {
 
 export interface OrderInterface {
   collection_date: Date;
+  collection_time_start: Date;
+  collection_time_end: Date;
   status: OrderStatuses;
   collection_address: string;
   customer_name: string;
@@ -59,6 +61,8 @@ export const luggagesData: LuggageInterface[] = [
 export const ordersData: OrderInterface[] = [
   {
     collection_date: new Date('2024-11-01'),
+    collection_time_start: new Date('2024-11-01T08:00:00'),
+    collection_time_end: new Date('2024-11-01T09:00:00'),
     status: OrderStatuses.AT_RISK,
     customer_name: 'Alice Johnson',
     collection_address: '123 Maple St, New York, NY',
@@ -66,6 +70,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-02'),
+    collection_time_start: new Date('2024-11-02T09:00:00'),
+    collection_time_end: new Date('2024-11-02T11:30:00'),
     status: OrderStatuses.COMPLETED,
     customer_name: 'Bob Smith',
     collection_address: '456 Elm St, Los Angeles, CA',
@@ -73,6 +79,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-03'),
+    collection_time_start: new Date('2024-11-03T07:15:00'),
+    collection_time_end: new Date('2024-11-03T09:15:00'),
     status: OrderStatuses.AT_RISK,
     customer_name: 'Charlie Brown',
     collection_address: '789 Pine St, Chicago, IL',
@@ -80,6 +88,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-04'),
+    collection_time_start: new Date('2024-11-04T10:45:00'),
+    collection_time_end: new Date('2024-11-04T12:00:00'),
     status: OrderStatuses.NOT_ARRIVED,
     customer_name: 'Daisy Green',
     collection_address: '101 Oak Ave, Houston, TX',
@@ -87,6 +97,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-05'),
+    collection_time_start: new Date('2024-11-05T08:30:00'),
+    collection_time_end: new Date('2024-11-05T10:30:00'),
     status: OrderStatuses.FAILED,
     customer_name: 'Evan Black',
     collection_address: '202 Cedar Blvd, Phoenix, AZ',
@@ -94,6 +106,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-06'),
+    collection_time_start: new Date('2024-11-06T09:00:00'),
+    collection_time_end: new Date('2024-11-06T11:00:00'),
     status: OrderStatuses.UPCOMING,
     customer_name: 'Fiona White',
     collection_address: '303 Birch Ln, Philadelphia, PA',
@@ -101,6 +115,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-07'),
+    collection_time_start: new Date('2024-11-07T07:30:00'),
+    collection_time_end: new Date('2024-11-07T09:00:00'),
     status: OrderStatuses.UPCOMING,
     customer_name: 'George Harris',
     collection_address: '404 Walnut Dr, San Antonio, TX',
@@ -108,6 +124,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-08'),
+    collection_time_start: new Date('2024-11-08T12:00:00'),
+    collection_time_end: new Date('2024-11-08T13:00:00'),
     status: OrderStatuses.NOT_ARRIVED,
     customer_name: 'Hannah Clark',
     collection_address: '505 Chestnut Rd, San Diego, CA',
@@ -115,6 +133,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-09'),
+    collection_time_start: new Date('2024-11-09T10:30:00'),
+    collection_time_end: new Date('2024-11-09T13:00:00'),
     status: OrderStatuses.UPCOMING,
     customer_name: 'Ian Lee',
     collection_address: '606 Redwood Pl, Dallas, TX',
@@ -122,6 +142,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-10'),
+    collection_time_start: new Date('2024-11-10T11:00:00'),
+    collection_time_end: new Date('2024-11-10T12:15:00'),
     status: OrderStatuses.NOT_ARRIVED,
     customer_name: 'Julia Martinez',
     collection_address: '707 Spruce Ct, San Jose, CA',
@@ -129,6 +151,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-11'),
+    collection_time_start: new Date('2024-11-11T09:15:00'),
+    collection_time_end: new Date('2024-11-11T10:45:00'),
     status: OrderStatuses.FAILED,
     customer_name: 'Alice Johnson',
     collection_address: '808 Maple St, Austin, TX',
@@ -136,6 +160,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-12'),
+    collection_time_start: new Date('2024-11-12T13:00:00'),
+    collection_time_end: new Date('2024-11-12T15:30:00'),
     status: OrderStatuses.NOT_ARRIVED,
     customer_name: 'Bob Smith',
     collection_address: '909 Oak St, Jacksonville, FL',
@@ -143,6 +169,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-13'),
+    collection_time_start: new Date('2024-11-13T08:00:00'),
+    collection_time_end: new Date('2024-11-13T09:30:00'),
     status: OrderStatuses.UPCOMING,
     customer_name: 'Charlie Brown',
     collection_address: '101 Pine St, San Francisco, CA',
@@ -150,6 +178,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-14'),
+    collection_time_start: new Date('2024-11-14T10:00:00'),
+    collection_time_end: new Date('2024-11-14T12:30:00'),
     status: OrderStatuses.UPCOMING,
     customer_name: 'Daisy Green',
     collection_address: '202 Elm Ave, Columbus, OH',
@@ -157,6 +187,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-15'),
+    collection_time_start: new Date('2024-11-15T11:00:00'),
+    collection_time_end: new Date('2024-11-15T12:45:00'),
     status: OrderStatuses.AT_RISK,
     customer_name: 'Evan Black',
     collection_address: '303 Cedar St, Fort Worth, TX',
@@ -164,6 +196,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-16'),
+    collection_time_start: new Date('2024-11-16T09:30:00'),
+    collection_time_end: new Date('2024-11-16T11:30:00'),
     status: OrderStatuses.UPCOMING,
     customer_name: 'Fiona White',
     collection_address: '404 Birch Blvd, Charlotte, NC',
@@ -171,6 +205,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-17'),
+    collection_time_start: new Date('2024-11-17T07:30:00'),
+    collection_time_end: new Date('2024-11-17T10:00:00'),
     status: OrderStatuses.UPCOMING,
     customer_name: 'George Harris',
     collection_address: '505 Walnut St, Detroit, MI',
@@ -178,6 +214,8 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-18'),
+    collection_time_start: new Date('2024-11-18T12:15:00'),
+    collection_time_end: new Date('2024-11-18T13:45:00'),
     status: OrderStatuses.UPCOMING,
     customer_name: 'Hannah Clark',
     collection_address: '606 Chestnut Dr, El Paso, TX',
@@ -185,86 +223,20 @@ export const ordersData: OrderInterface[] = [
   },
   {
     collection_date: new Date('2024-11-19'),
-    status: OrderStatuses.UPCOMING,
+    collection_time_start: new Date('2024-11-19T08:45:00'),
+    collection_time_end: new Date('2024-11-19T11:00:00'),
+    status: OrderStatuses.COMPLETED,
     customer_name: 'Ian Lee',
-    collection_address: '707 Spruce Pl, Memphis, TN',
-    luggages: [luggagesData[3]],
+    collection_address: '707 Redwood Pl, Memphis, TN',
+    luggages: [luggagesData[3], luggagesData[1]],
   },
   {
     collection_date: new Date('2024-11-20'),
-    status: OrderStatuses.NOT_ARRIVED,
-    customer_name: 'Julia Martinez',
-    collection_address: '808 Redwood Ct, Baltimore, MD',
-    luggages: [luggagesData[4], luggagesData[1]],
-  },
-  {
-    collection_date: new Date('2024-11-21'),
-    status: OrderStatuses.AT_RISK,
-    customer_name: 'Alice Johnson',
-    collection_address: '909 Maple St, Milwaukee, WI',
-    luggages: [luggagesData[0], luggagesData[3]],
-  },
-  {
-    collection_date: new Date('2024-11-22'),
-    status: OrderStatuses.UPCOMING,
-    customer_name: 'Bob Smith',
-    collection_address: '101 Oak Blvd, Albuquerque, NM',
-    luggages: [luggagesData[1]],
-  },
-  {
-    collection_date: new Date('2024-11-23'),
-    status: OrderStatuses.UPCOMING,
-    customer_name: 'Charlie Brown',
-    collection_address: '202 Cedar Ln, Tucson, AZ',
-    luggages: [luggagesData[2], luggagesData[4]],
-  },
-  {
-    collection_date: new Date('2024-11-24'),
-    status: OrderStatuses.UPCOMING,
-    customer_name: 'Daisy Green',
-    collection_address: '303 Birch Rd, Fresno, CA',
-    luggages: [luggagesData[3], luggagesData[1]],
-  },
-  {
-    collection_date: new Date('2024-11-25'),
-    status: OrderStatuses.AT_RISK,
-    customer_name: 'Evan Black',
-    collection_address: '404 Walnut Ct, Sacramento, CA',
-    luggages: [luggagesData[4]],
-  },
-  {
-    collection_date: new Date('2024-11-26'),
+    collection_time_start: new Date('2024-11-20T14:00:00'),
+    collection_time_end: new Date('2024-11-20T16:30:00'),
     status: OrderStatuses.FAILED,
-    customer_name: 'Fiona White',
-    collection_address: '505 Chestnut Pl, Kansas City, MO',
-    luggages: [luggagesData[0], luggagesData[2], luggagesData[4]],
-  },
-  {
-    collection_date: new Date('2024-11-27'),
-    status: OrderStatuses.AT_RISK,
-    customer_name: 'George Harris',
-    collection_address: '606 Redwood Dr, Atlanta, GA',
-    luggages: [luggagesData[1]],
-  },
-  {
-    collection_date: new Date('2024-11-28'),
-    status: OrderStatuses.COMPLETED,
-    customer_name: 'Hannah Clark',
-    collection_address: '707 Spruce Ln, Miami, FL',
-    luggages: [luggagesData[2], luggagesData[0]],
-  },
-  {
-    collection_date: new Date('2024-11-29'),
-    status: OrderStatuses.UPCOMING,
-    customer_name: 'Ian Lee',
-    collection_address: '808 Maple Rd, Raleigh, NC',
-    luggages: [luggagesData[3], luggagesData[1]],
-  },
-  {
-    collection_date: new Date('2024-11-30'),
-    status: OrderStatuses.COMPLETED,
     customer_name: 'Julia Martinez',
-    collection_address: '909 Oak Blvd, Omaha, NE',
+    collection_address: '808 Spruce Blvd, Baltimore, MD',
     luggages: [luggagesData[4]],
   },
 ];
