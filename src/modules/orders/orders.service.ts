@@ -2,8 +2,8 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
-import { OrderStatuses } from 'common/enums/enums';
-import { FindManyOptions, Repository } from 'typeorm';
+import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
+import { FindManyOptions, Like, Repository } from 'typeorm';
 
 import { OrderQueryParams } from './types';
 
@@ -14,16 +14,74 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
   ) {}
 
-  async findAll({ sortBy, filterBy, page, companyId }: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
+  async findAll({
+    sortBy,
+    filterBy,
+    page,
+    companyId,
+    search,
+  }: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
     const findSettings: FindManyOptions<Order> = {
-      order: { ...(<Record<string, string>>JSON.parse(sortBy)) },
       skip: (page - 1) * ORDER_PAGE_LENGTH,
       take: ORDER_PAGE_LENGTH,
       relations: ['luggages'],
-      where: {
-        status: OrderStatuses[filterBy],
-        company: { id: companyId },
-      },
+      where: search
+        ? [
+            {
+              status: OrderStatuses[filterBy],
+              company: { id: companyId },
+              customer: {
+                full_name: Like(`%${search}%`),
+              },
+            },
+            {
+              status: OrderStatuses[filterBy],
+              company: { id: companyId },
+              collection_address: Like(`%${search}%`),
+            },
+            {
+              status: OrderStatuses[filterBy],
+              company: { id: companyId },
+              luggages: {
+                luggage_type: <LuggageTypes>(<unknown>Like(`%${search}%`)),
+              },
+            },
+            {
+              status: OrderStatuses[filterBy],
+              company: { id: companyId },
+              customer: {
+                phone_number: <LuggageTypes>(<unknown>Like(`%${search}%`)),
+              },
+            },
+            {
+              status: OrderStatuses[filterBy],
+              company: { id: companyId },
+              customer: {
+                email: <LuggageTypes>(<unknown>Like(`%${search}%`)),
+              },
+            },
+            {
+              status: OrderStatuses[filterBy],
+              company: { id: companyId },
+              route: {
+                id: <number>(<unknown>Like(`%${search}%`)),
+              },
+            },
+            {
+              status: OrderStatuses[filterBy],
+              company: { id: companyId },
+              route: {
+                id: <number>(<unknown>Like(`%${search}%`)),
+              },
+            },
+            {
+              status: OrderStatuses[filterBy],
+              company: { id: companyId },
+              collection_date: <Date>(<unknown>Like(`%${search}%`)),
+            },
+          ]
+        : { status: OrderStatuses[filterBy], company: { id: companyId } },
+      order: { ...(<Record<string, string>>JSON.parse(sortBy)) },
     };
 
     try {
