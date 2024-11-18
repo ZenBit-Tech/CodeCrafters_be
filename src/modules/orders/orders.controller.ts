@@ -21,6 +21,7 @@ export class OrdersController {
   @ApiQuery({ name: 'sort_by', description: 'Sorting criteria in JSON format', example: '{"collection_date":"ASC"}' })
   @ApiQuery({ name: 'filter_by', description: 'Filter orders by status', example: 'COMPLETED' })
   @ApiQuery({ name: 'page', description: 'Page number for pagination', example: 1 })
+  @ApiQuery({ name: 'search', description: 'search string', example: 'Alice' })
   @ApiQuery({ name: 'company_id', description: 'ID of the company for filtering orders', example: 1 })
   @ApiResponse({
     status: 200,
