@@ -39,6 +39,24 @@ export class OrdersController {
   }
 
   @Get('by-dates')
+  @ApiQuery({ name: 'date', description: 'date start for filters by collection_date', example: new Date().toISOString() })
+  @ApiQuery({ name: 'companyId', description: 'ID of the company for filtering orders', example: 1 })
+  @ApiResponse({
+    status: 200,
+    description: 'Map of dates to order counts',
+    schema: {
+      type: 'object',
+      additionalProperties: { type: 'number' },
+      example: {
+        '2024-11-01': 5,
+        '2024-11-02': 3,
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    type: FailedResponse,
+  })
   async findOrdersDates(@Query() { date, companyId }: { date: Date; companyId: number }): Promise<Record<string, number>> {
     return this.ordersService.getDates(date, companyId);
   }
