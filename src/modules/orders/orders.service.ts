@@ -1,9 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { FindManyOptions, Like, MoreThanOrEqual, Repository, IsNull } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
-import { FindManyOptions, IsNull, Like, Repository } from 'typeorm';
 
 import { OrderServiceParams } from './types';
 
@@ -98,6 +99,34 @@ export class OrdersService {
       return { orders, page: +page, pagesCount: Math.ceil(ordersCount / 10) };
     } catch (error) {
       throw new InternalServerErrorException('Internal server error');
+    }
+  }
+
+  async getDates(date: Date, companyId: number): Promise<Record<string, number>> {
+    try {
+      const orders = await this.orderRepository.find({
+        where: { collection_date: MoreThanOrEqual(date), company: { id: companyId } },
+      });
+
+      console.log(orders);
+
+      const datesByOrders: Record<string, number> = {};
+
+      // for (const key in orders) {
+      //   const order = orders[key];
+
+      //   if (!order.route) continue;
+
+      //   if (datesByOrders[order.collection_date.toISOString().split('T')[0]]) {
+      //     datesByOrders[order.collection_date.toISOString().split('T')[0]] += 1;
+      //   } else {
+      //     datesByOrders[order.collection_date.toISOString().split('T')[0]] = 1;
+      //   }
+      // }
+
+      return datesByOrders;
+    } catch (error) {
+      throw new InternalServerErrorException();
     }
   }
 }

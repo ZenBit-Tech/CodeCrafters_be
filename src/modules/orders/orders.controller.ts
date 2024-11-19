@@ -37,4 +37,9 @@ export class OrdersController {
   async findAll(@Query() queryParams: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
     return this.ordersService.findAll({ ...queryParams, isNew: stringToBoolean(queryParams.isNew) });
   }
+
+  @Get('by-dates')
+  async findOrdersDates(@Query() { date, companyId }: { date: Date; companyId: number }): Promise<Record<string, number>> {
+    return this.ordersService.getDates(date, companyId);
+  }
 }
