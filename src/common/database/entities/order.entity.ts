@@ -32,7 +32,7 @@ export class Order {
 
   @ManyToOne(() => Route, (route) => route.id, { cascade: true, eager: true })
   @JoinColumn()
-  route: Route;
+  route: Route | null;
 
   @ManyToOne(() => Company, (company) => company.id, { cascade: true, eager: true })
   @JoinColumn()

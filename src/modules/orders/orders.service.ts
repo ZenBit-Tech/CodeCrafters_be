@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { FindManyOptions, Like, MoreThanOrEqual, Repository, IsNull } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
@@ -108,21 +107,19 @@ export class OrdersService {
         where: { collection_date: MoreThanOrEqual(date), company: { id: companyId } },
       });
 
-      console.log(orders);
-
       const datesByOrders: Record<string, number> = {};
 
-      // for (const key in orders) {
-      //   const order = orders[key];
+      for (const order of orders) {
+        if (order.route === null) continue;
 
-      //   if (!order.route) continue;
+        const collectionDateKey = order.collection_date.toISOString().split('T')[0];
 
-      //   if (datesByOrders[order.collection_date.toISOString().split('T')[0]]) {
-      //     datesByOrders[order.collection_date.toISOString().split('T')[0]] += 1;
-      //   } else {
-      //     datesByOrders[order.collection_date.toISOString().split('T')[0]] = 1;
-      //   }
-      // }
+        if (datesByOrders[collectionDateKey]) {
+          datesByOrders[collectionDateKey] += 1;
+        } else {
+          datesByOrders[collectionDateKey] = 1;
+        }
+      }
 
       return datesByOrders;
     } catch (error) {
