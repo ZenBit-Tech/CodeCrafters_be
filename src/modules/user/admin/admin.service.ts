@@ -34,7 +34,9 @@ export class AdminService {
 
   async create(createAdminData: CreateAdminDto): Promise<ResponseInterface> {
     try {
-      if (createAdminData.role !== Roles.ADMIN) throw new BadRequestException('User should have admin role');
+      if (![Roles.ADMIN, Roles.SUPERADMIN].includes(createAdminData.role)) {
+        throw new BadRequestException('User should have admin role');
+      }
 
       const existingUser = await this.userRepo.findOne({ where: { email: createAdminData.email } });
       if (existingUser) {
