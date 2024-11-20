@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, SetMetadata, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
@@ -21,6 +21,15 @@ export class DriverController {
   @ApiResponse({ status: 201, type: User })
   async create(@Body() createDriverDto: CreateDriverDto): Promise<User> {
     return this.driverService.create(createDriverDto);
+  }
+
+  @Get('')
+  @UseGuards(RolesGuard, UserCompanyGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Get drivers' })
+  @ApiResponse({ status: 200, type: [User] })
+  async findAll(@Query() { sortBy, search, companyId }: { sortBy: 'ASC' | 'DESC'; search: string; companyId: number }): Promise<User[]> {
+    return this.driverService.findAll(sortBy, search, companyId);
   }
 
   @Get(':id')
