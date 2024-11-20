@@ -6,4 +6,5 @@ export interface OrderQueryParams {
   search: string;
   page: number;
   companyId: number;
+  isNew: 'true' | 'false';
 }
