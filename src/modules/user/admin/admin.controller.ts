@@ -23,6 +23,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Create admin' })
   @ApiResponse({ status: 201, type: SuccessResponse })
   @ApiResponse({ status: 400, type: FailedResponse })
+  @ApiResponse({ status: 409, description: 'Conflict: Email already exists' })
   async create(@Body() adminData: CreateAdminDto): Promise<ResponseInterface> {
     return this.adminService.create(adminData);
   }
@@ -33,6 +34,8 @@ export class AdminController {
   @ApiOperation({ summary: 'Get list of admins' })
   @ApiResponse({ status: 200, type: [User] })
   @ApiResponse({ status: 400, type: FailedResponse })
+  @ApiResponse({ status: 404, description: 'Not Found: Admin does not exist' })
+  @ApiResponse({ status: 409, description: 'Conflict: Email already exists' })
   async getList(): Promise<User[] | ResponseInterface> {
     return this.adminService.getAll();
   }
