@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { FindManyOptions, Like, MoreThanOrEqual, Repository, IsNull } from 'typeorm';
+import { FindManyOptions, IsNull, Like, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
@@ -104,26 +104,21 @@ export class OrdersService {
   async getDates(date: Date, companyId: number): Promise<Record<string, number>> {
     try {
       const orders = await this.orderRepository.find({
-        where: { collection_date: MoreThanOrEqual(date), company: { id: companyId } },
+        where: {
+          collection_date: MoreThanOrEqual(date),
+          company: { id: companyId },
+          route: Not(IsNull()),
+        },
       });
 
-      const datesByOrders: Record<string, number> = {};
-
-      for (const order of orders) {
-        if (order.route === null) continue;
-
+      return orders.reduce<Record<string, number>>((acc, order) => {
         const collectionDateKey = order.collection_date.toISOString().split('T')[0];
-
-        if (datesByOrders[collectionDateKey]) {
-          datesByOrders[collectionDateKey] += 1;
-        } else {
-          datesByOrders[collectionDateKey] = 1;
-        }
-      }
-
-      return datesByOrders;
+        acc[collectionDateKey] = (acc[collectionDateKey] || 0) + 1;
+        return acc;
+      }, {});
     } catch (error) {
-      throw new InternalServerErrorException();
+      console.error('Error fetching dates:', error);
+      throw new InternalServerErrorException('Failed to fetch dates');
     }
   }
 }
