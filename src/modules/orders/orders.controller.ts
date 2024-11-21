@@ -34,6 +34,6 @@ export class OrdersController {
   @ApiResponse({ status: 400, description: 'Invalid query parameters' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async findAll(@Query() queryParams: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
-    return this.ordersService.findAll(queryParams);
+    return this.ordersService.findAll({ ...queryParams, isNew: queryParams.isNew === 'true' });
   }
 }

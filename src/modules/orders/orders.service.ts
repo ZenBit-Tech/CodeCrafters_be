@@ -5,7 +5,7 @@ import { Order } from 'common/database/entities/order.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
 import { FindManyOptions, IsNull, Like, Repository } from 'typeorm';
 
-import { OrderQueryParams } from './types';
+import { OrderServiceParams } from './types';
 
 @Injectable()
 export class OrdersService {
@@ -21,7 +21,7 @@ export class OrdersService {
     companyId,
     search,
     isNew,
-  }: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
+  }: OrderServiceParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
     const findSettings: FindManyOptions<Order> = {
       skip: (page - 1) * ORDER_PAGE_LENGTH,
       take: ORDER_PAGE_LENGTH,
@@ -31,7 +31,7 @@ export class OrdersService {
             {
               status: OrderStatuses[filterBy],
               company: { id: companyId },
-              route: isNew === 'true' ? IsNull() : {},
+              route: isNew ? IsNull() : {},
               customer: {
                 full_name: Like(`%${search}%`),
               },
@@ -40,7 +40,7 @@ export class OrdersService {
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               collection_address: Like(`%${search}%`),
-              route: isNew === 'true' ? IsNull() : {},
+              route: isNew ? IsNull() : {},
             },
             {
               status: OrderStatuses[filterBy],
@@ -48,7 +48,7 @@ export class OrdersService {
               luggages: {
                 luggage_type: <LuggageTypes>(<unknown>Like(`%${search}%`)),
               },
-              route: isNew === 'true' ? IsNull() : {},
+              route: isNew ? IsNull() : {},
             },
             {
               status: OrderStatuses[filterBy],
@@ -56,7 +56,7 @@ export class OrdersService {
               customer: {
                 phone_number: <LuggageTypes>(<unknown>Like(`%${search}%`)),
               },
-              route: isNew === 'true' ? IsNull() : {},
+              route: isNew ? IsNull() : {},
             },
             {
               status: OrderStatuses[filterBy],
@@ -64,7 +64,7 @@ export class OrdersService {
               customer: {
                 email: <LuggageTypes>(<unknown>Like(`%${search}%`)),
               },
-              route: isNew === 'true' ? IsNull() : {},
+              route: isNew ? IsNull() : {},
             },
             {
               status: OrderStatuses[filterBy],
@@ -84,10 +84,10 @@ export class OrdersService {
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               collection_date: <Date>(<unknown>Like(`%${search}%`)),
-              route: isNew === 'true' ? IsNull() : {},
+              route: isNew ? IsNull() : {},
             },
           ]
-        : { status: OrderStatuses[filterBy], company: { id: companyId }, route: isNew === 'true' ? IsNull() : {} },
+        : { status: OrderStatuses[filterBy], company: { id: companyId }, route: isNew ? IsNull() : {} },
       order: { ...(<Record<string, string>>JSON.parse(sortBy)) },
     };
 
