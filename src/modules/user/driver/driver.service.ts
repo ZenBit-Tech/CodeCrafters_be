@@ -2,8 +2,9 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
+import { Roles } from 'common/enums/enums';
 import { ResponseInterface } from 'common/types/interfaces';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, Like, Repository } from 'typeorm';
 
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
@@ -26,6 +27,17 @@ export class DriverService {
       return await this.entityManager.save(dispatcher);
     } catch (error) {
       throw new InternalServerErrorException('Internal server error');
+    }
+  }
+
+  async findAll(sortBy: 'ASC' | 'DESC', search: string, companyId: number): Promise<User[]> {
+    try {
+      return await this.userRepo.find({
+        where: { company_id: { id: companyId }, role: Roles.DRIVER, full_name: Like(`%${search}%`) },
+        order: { full_name: sortBy },
+      });
+    } catch (error) {
+      throw new BadRequestException('There is no such dispatcher');
     }
   }
 
