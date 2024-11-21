@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateCompanyDto {
   @IsString()
@@ -8,7 +8,7 @@ export class UpdateCompanyDto {
   name?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({ example: 'https://company-logo', description: 'Company logo' })
   logo?: string;
 

@@ -26,6 +26,10 @@ export class User {
   @ApiProperty({ example: Roles.ADMIN, description: 'user role' })
   role: Roles;
 
+  @Column({ nullable: true })
+  @ApiProperty({ example: '+1234567890', description: 'user phone number' })
+  phone_number?: string;
+
   @ManyToOne(() => Company, (company) => company.id, { cascade: true, eager: true })
   @JoinColumn()
   @ApiProperty({ example: Company, description: 'user company' })

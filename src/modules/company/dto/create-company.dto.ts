@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class CreateCompanyDto {
   @IsString()
@@ -8,9 +8,9 @@ export class CreateCompanyDto {
   name: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({ example: 'https://company-logo', description: 'Company logo' })
-  logo: string;
+  logo?: string;
 
   @IsEmail()
   @IsNotEmpty()
