@@ -7,7 +7,7 @@ import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { Repository } from 'typeorm';
 
-interface AccessTokenInterface extends jwt.Jwt {
+export interface AccessTokenInterface extends jwt.Jwt {
   fullName: string;
   email: string;
   role: Roles;
@@ -29,6 +29,8 @@ export class UserCompanyGuard implements CanActivate {
     try {
       if (request.method === 'POST') {
         if (request.body.company_id !== decodedToken.company_id.id) throw new Error();
+      } else if (request.method === 'GET' && !request.params['id']) {
+        return true;
       } else {
         const user = await this.userRepo.findOneByOrFail({ id: +request.params['id'] });
         if (user.company_id.id !== decodedToken.company_id.id) throw new Error();
