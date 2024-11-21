@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { FindManyOptions, IsNull, Like, MoreThanOrEqual, Not, Repository } from 'typeorm';
+import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
@@ -103,9 +103,12 @@ export class OrdersService {
 
   async getDates(date: Date, companyId: number): Promise<Record<string, number>> {
     try {
+      const datePlus30 = new Date(date);
+      datePlus30.setMonth(datePlus30.getMonth() === 12 ? 1 : datePlus30.getMonth() + 1);
+
       const orders = await this.orderRepository.find({
         where: {
-          collection_date: MoreThanOrEqual(date),
+          collection_date: Between(date, datePlus30),
           company: { id: companyId },
           route: Not(IsNull()),
         },
