@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
+import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
 
 import { OrderServiceParams } from './types';
 
@@ -103,12 +103,29 @@ export class OrdersService {
 
   async getDates(date: Date, companyId: number): Promise<Record<string, number>> {
     try {
-      const datePlus30 = new Date(date);
-      datePlus30.setMonth(datePlus30.getMonth() === 12 ? 1 : datePlus30.getMonth() + 1);
+      let dateStart: Date = new Date(date);
+      const dateEnd: Date = new Date(date);
+      if (dateStart.getMonth() <= new Date().getMonth() && dateStart.getDate() <= 30) {
+        dateStart = new Date();
+        dateStart.setDate(dateStart.getDate() - 1);
+        dateEnd.setMonth(dateEnd.getMonth() === 12 ? 1 : dateEnd.getMonth() + 1);
+      } else {
+        if (dateEnd.getMonth() === 11) {
+          dateEnd.setFullYear(dateEnd.getFullYear() + 1);
+          dateEnd.setMonth(1);
+        } else if (dateEnd.getMonth() === 12) {
+          dateEnd.setFullYear(dateEnd.getFullYear() + 1);
+          dateEnd.setMonth(2);
+        } else {
+          dateEnd.setMonth(dateEnd.getMonth() + 1);
+        }
+        dateEnd.setDate(6);
+        dateStart.setDate(dateStart.getDate() - 6);
+      }
 
       const orders = await this.orderRepository.find({
         where: {
-          collection_date: Between(date, datePlus30),
+          collection_date: Between(dateStart, dateEnd),
           company: { id: companyId },
           route: Not(IsNull()),
         },
