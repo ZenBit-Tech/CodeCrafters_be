@@ -30,6 +30,16 @@ export class CompanyController {
     return this.companyService.getList(page, pageSize, searchTerm, sortBy, sortOrder);
   }
 
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
+  @ApiOperation({ summary: 'Get company by id' })
+  @ApiResponse({ status: 200, type: Company })
+  @ApiResponse({ status: 404, description: 'Company not found' })
+  async getById(@Param('id') id: string): Promise<Company> {
+    return this.companyService.getById(+id);
+  }
+
   @Post()
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.SUPERADMIN])
