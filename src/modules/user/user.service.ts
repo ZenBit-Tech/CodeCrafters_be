@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { User } from 'common/database/entities/user.entity';
 import { FindManyOptions, FindOptionsWhere, Like, Repository } from 'typeorm';
+
 import { UserQueryParams } from './types';
-import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
-import { Roles } from 'common/enums/enums';
 
 @Injectable()
 export class UserService {
@@ -21,7 +21,7 @@ export class UserService {
     let parsedSortBy: Record<string, 'ASC' | 'DESC'> = { full_name: 'ASC' };
     if (sortBy) {
       try {
-        parsedSortBy = JSON.parse(sortBy);
+        parsedSortBy = <Record<string, 'ASC' | 'DESC'>>JSON.parse(sortBy);
       } catch (error) {
         throw new BadRequestException('Invalid sortBy format');
       }
@@ -29,7 +29,7 @@ export class UserService {
 
     const whereCondition: FindOptionsWhere<User> = {
       ...(search && { full_name: Like(`%${search}%`) }),
-      ...(filterBy && { role: filterBy as Roles }),
+      ...(filterBy && { role: filterBy }),
       company_id: { id: companyId },
     };
 
