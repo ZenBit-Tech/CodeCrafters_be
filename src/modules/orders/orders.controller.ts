@@ -4,6 +4,7 @@ import { Order } from 'common/database/entities/order.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
 import { FailedResponse } from 'common/types/failed-response.dto';
+import { stringToBoolean } from 'common/utils/stringToBoolean';
 
 import { OrdersResponse } from './dto/response.dto';
 import { OrdersService } from './orders.service';
@@ -34,6 +35,6 @@ export class OrdersController {
   @ApiResponse({ status: 400, description: 'Invalid query parameters' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async findAll(@Query() queryParams: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
-    return this.ordersService.findAll(queryParams);
+    return this.ordersService.findAll({ ...queryParams, isNew: stringToBoolean(queryParams.isNew) });
   }
 }
