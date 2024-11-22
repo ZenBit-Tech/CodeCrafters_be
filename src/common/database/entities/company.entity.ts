@@ -11,6 +11,10 @@ export class Company {
   @ApiProperty({ example: 'Starbulka', description: 'company name' })
   name: string;
 
+  @Column({ nullable: false })
+  @ApiProperty({ example: 'John Doe', description: 'client name' })
+  client_name: string;
+
   @Column({ default: '' })
   @ApiProperty({ example: 'https://company-logo-link', description: 'link to company logo' })
   logo: string;
