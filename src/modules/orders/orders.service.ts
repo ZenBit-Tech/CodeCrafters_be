@@ -110,12 +110,9 @@ export class OrdersService {
         dateStart.setDate(dateStart.getDate() - 1);
         dateEnd.setMonth(dateEnd.getMonth() === 12 ? 1 : dateEnd.getMonth() + 1);
       } else {
-        if (dateEnd.getMonth() === 11) {
+        if (dateEnd.getMonth() === 12) {
           dateEnd.setFullYear(dateEnd.getFullYear() + 1);
           dateEnd.setMonth(1);
-        } else if (dateEnd.getMonth() === 12) {
-          dateEnd.setFullYear(dateEnd.getFullYear() + 1);
-          dateEnd.setMonth(2);
         } else {
           dateEnd.setMonth(dateEnd.getMonth() + 1);
         }
