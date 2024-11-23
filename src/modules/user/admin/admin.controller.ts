@@ -1,4 +1,4 @@
-import { Controller, Post, Patch, Param, Delete, Body, UseGuards, SetMetadata, Get } from '@nestjs/common';
+import { Controller, Post, Patch, Param, Delete, Body, UseGuards, SetMetadata, Get, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
@@ -31,13 +31,13 @@ export class AdminController {
   @Get()
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.SUPERADMIN])
-  @ApiOperation({ summary: 'Get list of admins' })
+  @ApiOperation({ summary: 'Get list of admins for a specific company' })
   @ApiResponse({ status: 200, type: [User] })
   @ApiResponse({ status: 400, type: FailedResponse })
   @ApiResponse({ status: 404, description: 'Not Found: Admin does not exist' })
   @ApiResponse({ status: 409, description: 'Conflict: Email already exists' })
-  async getList(): Promise<User[] | ResponseInterface> {
-    return this.adminService.getAll();
+  async getList(@Query('companyId') companyId: number): Promise<User[] | ResponseInterface> {
+    return this.adminService.getAll(companyId);
   }
 
   @Patch(':id')

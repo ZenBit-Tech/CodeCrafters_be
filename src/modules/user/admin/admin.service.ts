@@ -71,9 +71,16 @@ export class AdminService {
     }
   }
 
-  async getAll(): Promise<User[] | ResponseInterface> {
+  async getAll(companyId: number): Promise<User[] | ResponseInterface> {
     try {
-      return await this.userRepo.find({ where: { role: Roles.ADMIN } });
+      if (!companyId) {
+        throw new BadRequestException('companyId is required');
+      }
+
+      return await this.userRepo.find({
+        where: { role: Roles.ADMIN, company_id: { id: companyId } },
+        relations: ['company_id'],
+      });
     } catch (error) {
       return { status: 500, error: new InternalServerErrorException() };
     }
