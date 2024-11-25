@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Company } from 'common/database/entities/company.entity';
 import { Roles } from 'common/enums/enums';
@@ -36,8 +36,8 @@ export class CompanyController {
   @ApiOperation({ summary: 'Get company by id' })
   @ApiResponse({ status: 200, type: Company })
   @ApiResponse({ status: 404, description: 'Company not found' })
-  async getById(@Param('id') id: string): Promise<Company> {
-    return this.companyService.getById(+id);
+  async getById(@Param('id', ParseIntPipe) id: number): Promise<Company> {
+    return this.companyService.getById(id);
   }
 
   @Post()
