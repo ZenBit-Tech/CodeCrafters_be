@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
-import { FindManyOptions, IsNull, Like, Repository } from 'typeorm';
+import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
 
 import { OrderServiceParams } from './types';
 
@@ -98,6 +98,44 @@ export class OrdersService {
       return { orders, page: +page, pagesCount: Math.ceil(ordersCount / 10) };
     } catch (error) {
       throw new InternalServerErrorException('Internal server error');
+    }
+  }
+
+  async getDates(date: Date, companyId: number): Promise<Record<string, number>> {
+    try {
+      let dateStart: Date = new Date(date);
+      const dateEnd: Date = new Date(date);
+      if (dateStart.getMonth() <= new Date().getMonth() && dateStart.getDate() <= 30) {
+        dateStart = new Date();
+        dateStart.setDate(dateStart.getDate() - 1);
+        dateEnd.setMonth(dateEnd.getMonth() === 12 ? 1 : dateEnd.getMonth() + 1);
+      } else {
+        if (dateEnd.getMonth() === 12) {
+          dateEnd.setFullYear(dateEnd.getFullYear() + 1);
+          dateEnd.setMonth(1);
+        } else {
+          dateEnd.setMonth(dateEnd.getMonth() + 1);
+        }
+        dateEnd.setDate(6);
+        dateStart.setDate(dateStart.getDate() - 6);
+      }
+
+      const orders = await this.orderRepository.find({
+        where: {
+          collection_date: Between(dateStart, dateEnd),
+          company: { id: companyId },
+          route: Not(IsNull()),
+        },
+      });
+
+      return orders.reduce<Record<string, number>>((acc, order) => {
+        const collectionDateKey = order.collection_date.toISOString().split('T')[0];
+        acc[collectionDateKey] = (acc[collectionDateKey] || 0) + 1;
+        return acc;
+      }, {});
+    } catch (error) {
+      console.error('Error fetching dates:', error);
+      throw new InternalServerErrorException('Failed to fetch dates');
     }
   }
 }
