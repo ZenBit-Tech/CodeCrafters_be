@@ -3,6 +3,7 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
+import { UserCompanyGuard } from 'common/guards/userCompany.guard';
 import { FailedResponse } from 'common/types/failed-response.dto';
 import { stringToBoolean } from 'common/utils/stringToBoolean';
 
@@ -59,5 +60,22 @@ export class OrdersController {
   })
   async findOrdersDates(@Query() { date, companyId }: { date: Date; companyId: number }): Promise<Record<string, number>> {
     return this.ordersService.getDates(date, companyId);
+  }
+
+  @Get('by-id')
+  @UseGuards(RolesGuard, UserCompanyGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiQuery({ name: 'array of id', description: 'array of orders id', example: [1, 2, 3, 4, 5] })
+  @ApiResponse({
+    status: 200,
+    description: 'Orders array',
+    type: [Order],
+  })
+  @ApiResponse({
+    status: 500,
+    type: FailedResponse,
+  })
+  async findByIds(@Query() { ordersIdArray }: { ordersIdArray: number[] }): Promise<Order[]> {
+    return this.ordersService.findByIds(ordersIdArray);
   }
 }

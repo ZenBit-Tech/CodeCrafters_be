@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
-import { FindManyOptions, IsNull, Like, Between, Not, Repository, MoreThanOrEqual } from 'typeorm';
+import { FindManyOptions, IsNull, Like, Between, Not, Repository, MoreThanOrEqual, In } from 'typeorm';
 
 import { OrderServiceParams } from './types';
 
@@ -149,6 +149,14 @@ export class OrdersService {
     } catch (error) {
       console.error('Error fetching dates:', error);
       throw new InternalServerErrorException('Failed to fetch dates');
+    }
+  }
+
+  async findByIds(arrayOfId: number[]): Promise<Order[]> {
+    try {
+      return await this.orderRepository.find({ where: { id: In(arrayOfId) } });
+    } catch (error) {
+      throw new InternalServerErrorException('Internal server error');
     }
   }
 }
