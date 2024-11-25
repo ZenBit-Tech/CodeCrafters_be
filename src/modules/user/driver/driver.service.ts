@@ -4,7 +4,7 @@ import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
 import { ResponseInterface } from 'common/types/interfaces';
-import { EntityManager, Like, Repository } from 'typeorm';
+import { EntityManager, In, Like, Repository } from 'typeorm';
 
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
@@ -46,6 +46,14 @@ export class DriverService {
       return await this.userRepo.findOneByOrFail({ id });
     } catch (error) {
       throw new BadRequestException('There is no such dispatcher');
+    }
+  }
+
+  async findByListOfId(listOfId: number[]): Promise<User[]> {
+    try {
+      return await this.userRepo.find({ where: { id: In(listOfId) } });
+    } catch (error) {
+      throw new InternalServerErrorException('Internal server error');
     }
   }
 
