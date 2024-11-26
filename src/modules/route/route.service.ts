@@ -24,7 +24,7 @@ export class RouteService {
       await this.entityManager.save(routes);
       return { status: 201, message: 'Routes have been successfully created!' };
     } catch (error) {
-      throw new InternalServerErrorException("Can't create route");
+      throw new InternalServerErrorException(error);
     }
   }
 }
