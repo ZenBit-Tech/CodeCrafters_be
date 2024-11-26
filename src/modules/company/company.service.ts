@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
@@ -62,6 +62,22 @@ export class CompanyService {
       return { data, total };
     } catch (error) {
       throw new InternalServerErrorException('Failed to get company list');
+    }
+  }
+
+  async getById(id: number): Promise<Company> {
+    try {
+      const company = await this.companyRepo.findOne({ where: { id } });
+      if (!company) {
+        throw new NotFoundException('Company not found');
+      }
+
+      return company;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to get company info');
     }
   }
 
