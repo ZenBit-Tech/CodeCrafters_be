@@ -75,7 +75,7 @@ export class OrdersController {
     status: 500,
     type: FailedResponse,
   })
-  async findByIds(@Query() { ordersIdArray }: { ordersIdArray: number[] }): Promise<Order[]> {
+  async findByIds(@Query() { ordersIdArray }: { ordersIdArray: string }): Promise<Order[]> {
     return this.ordersService.findByIds(ordersIdArray);
   }
 }

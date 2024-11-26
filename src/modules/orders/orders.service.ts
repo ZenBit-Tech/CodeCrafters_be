@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
-import { FindManyOptions, IsNull, Like, Between, Not, Repository, MoreThanOrEqual, In } from 'typeorm';
+import { FindManyOptions, IsNull, Like, Between, Not, Repository, MoreThanOrEqual } from 'typeorm';
 
 import { OrderServiceParams } from './types';
 
@@ -146,15 +146,18 @@ export class OrdersService {
         acc[collectionDateKey] = (acc[collectionDateKey] || 0) + 1;
         return acc;
       }, {});
-    } catch (error) {
-      console.error('Error fetching dates:', error);
-      throw new InternalServerErrorException('Failed to fetch dates');
+    } catch (error: unknown) {
+      throw new InternalServerErrorException(error);
     }
   }
 
-  async findByIds(arrayOfId: number[]): Promise<Order[]> {
+  async findByIds(arrayOfId: string): Promise<Order[]> {
     try {
-      return await this.orderRepository.find({ where: { id: In(arrayOfId) } });
+      const query = this.orderRepository
+        .createQueryBuilder('order')
+        .where('order.id IN (:...ids)', { ids: <number[]>JSON.parse(arrayOfId) })
+        .orderBy('order.collection_date', 'ASC');
+      return await query.getMany();
     } catch (error) {
       throw new InternalServerErrorException('Internal server error');
     }
