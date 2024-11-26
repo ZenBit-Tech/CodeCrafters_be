@@ -1,9 +1,8 @@
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { User } from 'common/database/entities/user.entity';
 import { FindManyOptions, FindOptionsWhere, Like, Repository } from 'typeorm';
-
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
 import { UserQueryParams } from './types';
 
@@ -20,7 +19,7 @@ export class UserService {
     const pageNumber: number = Math.max(Number(page), 1);
 
     const parsedSortBy: Record<string, 'ASC' | 'DESC'> = sortBy
-      ? (JSON.parse(sortBy) as Record<string, 'ASC' | 'DESC'>)
+      ? <Record<string, 'ASC' | 'DESC'>>JSON.parse(sortBy)
       : { createdAt: 'DESC' };
 
     const whereCondition: FindOptionsWhere<User> = {
