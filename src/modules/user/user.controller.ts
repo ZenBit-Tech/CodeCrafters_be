@@ -1,9 +1,8 @@
-import { Controller, Get, Query, SetMetadata, UseGuards, Req, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Controller, Delete, Get, Param, Query, Req, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'common/enums/enums';
-import { AuthGuard } from 'common/guards/auth.guard';
 import { RolesGuard } from 'common/guards/roles.guard';
-import { UserCompanyGuard, AccessTokenInterface } from 'common/guards/userCompany.guard';
+import { AccessTokenInterface, UserCompanyGuard } from 'common/guards/userCompany.guard';
 import { Request } from 'express';
 
 import { UserResponseDto } from './dto/users-response.dto';
@@ -17,12 +16,12 @@ interface RequestWithUser extends Request {
 @ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
-@UseGuards(AuthGuard, RolesGuard, UserCompanyGuard)
+@UseGuards(RolesGuard, UserCompanyGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @SetMetadata('roles', [Roles.ADMIN])
+  @SetMetadata('roles', [Roles.ADMIN, Roles.SUPERADMIN])
   @ApiOperation({ summary: 'Retrieve a list of users belonging to the same company' })
   @ApiQuery({ name: 'sortBy', description: 'Sorting criteria in JSON format', example: '{"full_name":"ASC"}' })
   @ApiQuery({ name: 'filterBy', description: 'Filter users by role', example: 'ADMIN' })
@@ -39,9 +38,26 @@ export class UserController {
       throw new BadRequestException('User information is missing');
     }
 
-    const companyId = user.company_id.id;
-    const { users, page, pagesCount } = await this.userService.findAll(queryParams, companyId);
+    const { users, page, pagesCount } = await this.userService.findAll(queryParams, user.company_id.id);
 
     return { users, page, pagesCount };
+  }
+
+  @Delete(':id')
+  @SetMetadata('roles', [Roles.ADMIN, Roles.SUPERADMIN])
+  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async remove(@Param('id') id: number, @Req() req: RequestWithUser): Promise<{ message: string }> {
+    const { user } = req;
+
+    if (!user.company_id.id) {
+      throw new BadRequestException('User information is missing');
+    }
+
+    await this.userService.deleteUser(id);
+    return { message: `User with ID ${id} deleted successfully` };
   }
 }

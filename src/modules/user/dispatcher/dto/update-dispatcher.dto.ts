@@ -6,8 +6,11 @@ export class UpdateDispatcherDto {
   @Expose()
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'https://logo-path', description: 'dispatcher logo' })
-  logo: string;
+  @ApiProperty({
+    example: '+380931234567',
+    description: 'dispatcher phone number',
+  })
+  phone_number: string;
 
   @Expose()
   @IsString()
