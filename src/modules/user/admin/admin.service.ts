@@ -79,6 +79,7 @@ export class AdminService {
 
       return await this.userRepo.find({
         where: { role: Roles.ADMIN, company_id: { id: companyId } },
+        order: { createdAt: 'DESC' },
         relations: ['company_id'],
       });
     } catch (error) {

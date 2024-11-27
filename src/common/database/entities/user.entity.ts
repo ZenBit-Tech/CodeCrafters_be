@@ -30,6 +30,14 @@ export class User {
   @ApiProperty({ example: '+1234567890', description: 'user phone number' })
   phone_number?: string;
 
+  @Column({ nullable: true })
+  @ApiProperty({ example: '123456', description: 'OTP for driver authentication' })
+  otp?: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  @ApiProperty({ example: new Date(), description: 'OTP expiration time' })
+  otpExpiry?: Date;
+
   @ManyToOne(() => Company, (company) => company.id, { cascade: true, eager: true })
   @JoinColumn()
   @ApiProperty({ example: Company, description: 'user company' })
