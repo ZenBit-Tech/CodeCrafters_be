@@ -62,7 +62,7 @@ export class OrdersController {
     return this.ordersService.getDates(date, companyId);
   }
 
-  @Get('by-id')
+  @Get('by-ids')
   @UseGuards(RolesGuard, UserCompanyGuard)
   @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
   @ApiQuery({ name: 'array of id', description: 'array of orders id', example: [1, 2, 3, 4, 5] })
@@ -76,6 +76,6 @@ export class OrdersController {
     type: FailedResponse,
   })
   async findByIds(@Query() { ordersIdArray }: { ordersIdArray: string }): Promise<Order[]> {
-    return this.ordersService.findByIds(ordersIdArray);
+    return this.ordersService.findByIds(<number[]>JSON.parse(ordersIdArray));
   }
 }

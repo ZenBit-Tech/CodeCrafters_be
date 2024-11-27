@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { Order } from 'common/database/entities/order.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
-import { FindManyOptions, IsNull, Like, Between, Not, Repository, MoreThanOrEqual } from 'typeorm';
+import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
 
 import { OrderServiceParams } from './types';
 
@@ -23,6 +23,20 @@ export class OrdersService {
     isNew,
     startDate,
   }: OrderServiceParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
+    let dateFromServer;
+    let startOfDay;
+    let endOfDay;
+
+    if (startDate !== undefined) {
+      dateFromServer = new Date(startDate);
+      startOfDay = new Date(dateFromServer.getFullYear(), dateFromServer.getMonth(), dateFromServer.getDate());
+      endOfDay = new Date(dateFromServer.getFullYear(), dateFromServer.getMonth(), dateFromServer.getDate(), 23, 59, 59, 999);
+    }
+
+    const collectionDateCondition = {
+      collection_date: startDate !== undefined ? Between(startOfDay, endOfDay) : Not(IsNull()),
+    };
+
     const findSettings: FindManyOptions<Order> = {
       skip: (page - 1) * ORDER_PAGE_LENGTH,
       take: ORDER_PAGE_LENGTH,
@@ -30,8 +44,8 @@ export class OrdersService {
       where: search
         ? [
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
-              collection_date: MoreThanOrEqual(startDate),
               company: { id: companyId },
               route: isNew ? IsNull() : {},
               customer: {
@@ -39,15 +53,15 @@ export class OrdersService {
               },
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
-              collection_date: MoreThanOrEqual(startDate),
               company: { id: companyId },
               collection_address: Like(`%${search}%`),
               route: isNew ? IsNull() : {},
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
-              collection_date: MoreThanOrEqual(startDate),
               company: { id: companyId },
               luggages: {
                 luggage_type: <LuggageTypes>(<unknown>Like(`%${search}%`)),
@@ -55,8 +69,8 @@ export class OrdersService {
               route: isNew ? IsNull() : {},
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
-              collection_date: MoreThanOrEqual(startDate),
               company: { id: companyId },
               customer: {
                 phone_number: <LuggageTypes>(<unknown>Like(`%${search}%`)),
@@ -64,8 +78,8 @@ export class OrdersService {
               route: isNew ? IsNull() : {},
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
-              collection_date: MoreThanOrEqual(startDate),
               company: { id: companyId },
               customer: {
                 email: <LuggageTypes>(<unknown>Like(`%${search}%`)),
@@ -73,16 +87,16 @@ export class OrdersService {
               route: isNew ? IsNull() : {},
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
-              collection_date: MoreThanOrEqual(startDate),
               company: { id: companyId },
               route: {
                 id: <number>(<unknown>Like(`%${search}%`)),
               },
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
-              collection_date: MoreThanOrEqual(startDate),
               company: { id: companyId },
               route: {
                 id: <number>(<unknown>Like(`%${search}%`)),
@@ -96,8 +110,8 @@ export class OrdersService {
             },
           ]
         : {
+            ...collectionDateCondition,
             status: OrderStatuses[filterBy],
-            collection_date: MoreThanOrEqual(startDate),
             company: { id: companyId },
             route: isNew ? IsNull() : {},
           },
@@ -151,11 +165,11 @@ export class OrdersService {
     }
   }
 
-  async findByIds(arrayOfId: string): Promise<Order[]> {
+  async findByIds(arrayOfId: number[]): Promise<Order[]> {
     try {
       const query = this.orderRepository
         .createQueryBuilder('order')
-        .where('order.id IN (:...ids)', { ids: <number[]>JSON.parse(arrayOfId) })
+        .where('order.id IN (:...ids)', { ids: arrayOfId })
         .orderBy('order.collection_date', 'ASC');
       return await query.getMany();
     } catch (error) {

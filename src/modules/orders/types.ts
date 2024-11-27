@@ -17,5 +17,5 @@ export interface OrderServiceParams {
   page: number;
   companyId: number;
   isNew: boolean;
-  startDate: Date;
+  startDate: Date | undefined;
 }

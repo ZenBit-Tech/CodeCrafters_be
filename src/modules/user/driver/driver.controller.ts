@@ -32,7 +32,7 @@ export class DriverController {
     return this.driverService.findAll(sortBy, search, companyId);
   }
 
-  @Get('by-id')
+  @Get('by-ids')
   @UseGuards(RolesGuard, UserCompanyGuard)
   @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
   @ApiOperation({ summary: 'Get drivers by list of id' })
