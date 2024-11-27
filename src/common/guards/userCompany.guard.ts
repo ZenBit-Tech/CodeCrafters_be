@@ -1,12 +1,11 @@
+import { CanActivate, ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { Repository } from 'typeorm';
-
-import { CanActivate, ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
 export interface AccessTokenInterface {
   fullName: string;

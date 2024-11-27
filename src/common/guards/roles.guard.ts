@@ -1,9 +1,8 @@
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { Observable } from 'rxjs';
-
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 
 interface JwtPayload {
   role: string;
