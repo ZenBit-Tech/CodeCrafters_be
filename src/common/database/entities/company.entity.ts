@@ -11,7 +11,7 @@ export class Company {
   @ApiProperty({ example: 'Starbulka', description: 'company name' })
   name: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: '' })
   @ApiProperty({ example: 'John Doe', description: 'client name' })
   client_name: string;
 
