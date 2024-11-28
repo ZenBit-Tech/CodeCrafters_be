@@ -13,10 +13,10 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
-    private readonly configService: ConfigService,
-    private readonly smtpService: MailerService,
+      @InjectRepository(User)
+      private readonly userRepo: Repository<User>,
+      private readonly configService: ConfigService,
+      private readonly smtpService: MailerService,
   ) {}
 
   async authByEmail(email: string): Promise<SuccessResponse> {
@@ -25,9 +25,9 @@ export class AuthService {
 
       const secret: string = this.configService.getOrThrow('JWT_SECRET');
       const token: string = jwt.sign(
-        { fullName: user.full_name, email: user.email, role: user.role, company_id: user.company_id },
-        secret,
-        { expiresIn: '24h' },
+          { fullName: user.full_name, email: user.email, role: user.role, company_id: user.company_id },
+          secret,
+          { expiresIn: '24h' },
       );
 
       const userCompany: string = user.role === Roles.SUPERADMIN ? '' : user.company_id.name;
