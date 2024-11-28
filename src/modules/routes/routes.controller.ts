@@ -1,8 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Route } from 'common/database/entities/route.entity';
-// import { Roles } from 'common/enums/enums';
-// import { RolesGuard } from 'common/guards/roles.guard';
+import { Roles } from 'common/enums/enums';
+import { RolesGuard } from 'common/guards/roles.guard';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { RoutesService } from './routes.service';
@@ -13,8 +13,8 @@ export class RoutesController {
   constructor(private readonly routesService: RoutesService) {}
 
   @Post()
-  // @UseGuards(RolesGuard)
-  // @SetMetadata('roles', [Roles.SUPERADMIN])
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new route' })
   @ApiResponse({ status: 201, type: Route })
