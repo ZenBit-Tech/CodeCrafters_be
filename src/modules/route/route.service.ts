@@ -70,10 +70,8 @@ export class RouteService {
     if (searchQuery) {
       queryBuilder.andWhere('user.full_name LIKE :searchQuery', { searchQuery: `%${searchQuery}%` });
     }
-    console.log(drivers);
 
     if (drivers && drivers.length > 0) {
-      console.log(1);
       queryBuilder.andWhere('user.full_name IN (:...drivers)', { drivers });
     }
 
@@ -105,7 +103,4 @@ export class RouteService {
 
     return routes;
   }
-
 }
-
-
