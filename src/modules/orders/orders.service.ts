@@ -27,14 +27,14 @@ export class OrdersService {
     let startOfDay;
     let endOfDay;
 
-    if (startDate !== undefined) {
+    if (startDate) {
       dateFromServer = new Date(startDate);
       startOfDay = new Date(dateFromServer.getFullYear(), dateFromServer.getMonth(), dateFromServer.getDate());
       endOfDay = new Date(dateFromServer.getFullYear(), dateFromServer.getMonth(), dateFromServer.getDate(), 23, 59, 59, 999);
     }
 
     const collectionDateCondition = {
-      collection_date: startDate !== undefined ? Between(startOfDay, endOfDay) : Not(IsNull()),
+      collection_date: startDate ? Between(startOfDay, endOfDay) : Not(IsNull()),
     };
 
     const findSettings: FindManyOptions<Order> = {
