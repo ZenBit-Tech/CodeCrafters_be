@@ -10,6 +10,7 @@ import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
 import { CompanyModule } from 'modules/company/company.module';
+import { RouteModule } from 'modules/route/route.module';
 
 import { DatabaseModule } from './common/database/database.module';
 import { MailerModule } from './common/mailer/mailer.module';
@@ -29,6 +30,7 @@ import { UserModule } from './modules/user/user.module';
     UserModule,
     CompanyModule,
     OrdersModule,
+    RouteModule,
   ],
   controllers: [],
   providers: [],

@@ -1,7 +1,8 @@
 import { RouteStatuses } from 'common/enums/enums';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Company } from './company.entity';
+import { Order } from './order.entity';
 import { User } from './user.entity';
 
 @Entity()
@@ -28,6 +29,9 @@ export class Route {
   @ManyToOne(() => Company, (company) => company.id, { cascade: true, eager: true })
   @JoinColumn()
   company_id: Company;
+
+  @OneToMany(() => Order, (order) => order.route, { cascade: true })
+  orders: Order[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
