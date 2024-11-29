@@ -1,8 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Route } from 'common/database/entities/route.entity';
 import { SuccessResponse } from 'common/types/response-success.dto';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 
@@ -25,6 +25,20 @@ export class RouteService {
       return { status: 201, message: 'Routes have been successfully created!' };
     } catch (error) {
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  async getOne(id: number): Promise<Route> {
+    try {
+      return await this.routeRepo.findOneOrFail({
+        where: { id },
+        relations: ['orders'],
+      });
+    } catch (error: unknown) {
+      if (error instanceof EntityNotFoundError) {
+        throw new BadRequestException(error.message);
+      }
+      throw new InternalServerErrorException("Can't get route details");
     }
   }
 }
