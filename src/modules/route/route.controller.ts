@@ -1,15 +1,37 @@
-import { BadRequestException, Controller, Get, Param, ParseArrayPipe, ParseIntPipe, Query, SetMetadata, UseGuards } from '@nestjs/common';
-import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  SetMetadata,
+  BadRequestException,
+  Get,
+  Param,
+  ParseArrayPipe,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Route } from 'common/database/entities/route.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
+import { SuccessResponse } from 'common/types/response-success.dto';
 
+import { CreateRouteDto } from './dto/create-route.dto';
 import { RouteService } from './route.service';
 
-@ApiTags('Routes')
-@Controller('routes')
+@Controller('route')
 export class RouteController {
   constructor(private readonly routeService: RouteService) {}
+
+  @Post()
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Route creating' })
+  @ApiResponse({ status: 201, example: { status: 201, message: 'Routes created successfully' } })
+  async create(@Body() createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
+    return this.routeService.create(createRouteDto);
+  }
 
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.SUPERADMIN])

@@ -10,13 +10,13 @@ import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
 import { CompanyModule } from 'modules/company/company.module';
-import { RouteModule } from 'modules/route/route.module';
 
 import { DatabaseModule } from './common/database/database.module';
 import { MailerModule } from './common/mailer/mailer.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ModuleExampleModule } from './modules/module-example/module-example.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { RouteModule } from './modules/route/route.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({

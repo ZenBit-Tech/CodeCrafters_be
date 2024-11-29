@@ -1,19 +1,36 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Route } from 'common/database/entities/route.entity';
-import { Repository } from 'typeorm';
+import { SuccessResponse } from 'common/types/response-success.dto';
+import { EntityManager, Repository } from 'typeorm';
 
+import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
 
 @Injectable()
 export class RouteService {
   constructor(
     @InjectRepository(Route)
-    private readonly routeRepository: Repository<Route>,
+    private readonly routeRepo: Repository<Route>,
+    private readonly entityManager: EntityManager,
   ) {}
 
+  async create(createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
+    try {
+      const routes = createRouteDto.map((routeDto) => new Route(routeDto));
+
+      for (const route of routes) {
+        await this.routeRepo.save(route);
+      }
+      await this.entityManager.save(routes);
+      return { status: 201, message: 'Routes have been successfully created!' };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
   async getRouteById(id: number): Promise<Route> {
-    const route = await this.routeRepository.findOne({
+    const route = await this.routeRepo.findOne({
       where: { id },
       relations: ['user_id', 'company_id'],
     });
@@ -44,7 +61,7 @@ export class RouteService {
       throw new BadRequestException(new ErrorResponse(400, 'Invalid sort field.'));
     }
 
-    const queryBuilder = this.routeRepository
+    const queryBuilder = this.routeRepo
       .createQueryBuilder('route')
       .leftJoinAndSelect('route.user_id', 'user')
       .leftJoinAndSelect('route.company_id', 'company')
@@ -88,4 +105,7 @@ export class RouteService {
 
     return routes;
   }
+
 }
+
+
