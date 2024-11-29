@@ -2,6 +2,8 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Route } from 'common/database/entities/route.entity';
 import { SuccessResponse } from 'common/types/response-success.dto';
+import { RouteInform } from 'common/types/routeInformResponse';
+import { transformRouteObject } from 'common/utils/transformRouteObject';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
@@ -28,12 +30,14 @@ export class RouteService {
     }
   }
 
-  async getOne(id: number): Promise<Route> {
+  async getOne(id: number): Promise<RouteInform> {
     try {
-      return await this.routeRepo.findOneOrFail({
+      const route = await this.routeRepo.findOneOrFail({
         where: { id },
         relations: ['orders'],
       });
+
+      return transformRouteObject(route);
     } catch (error: unknown) {
       if (error instanceof EntityNotFoundError) {
         throw new BadRequestException(error.message);
