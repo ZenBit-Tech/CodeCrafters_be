@@ -49,6 +49,15 @@ export class DriverService {
     }
   }
 
+  async findByListOfId(listOfId: number[]): Promise<User[]> {
+    try {
+      const query = this.userRepo.createQueryBuilder('user').where('user.id IN (:...ids)', { ids: Array.from(listOfId) });
+      return await query.getMany();
+    } catch (error) {
+      throw new InternalServerErrorException('Internal server error');
+    }
+  }
+
   async update(id: number, updateDriverDto: UpdateDriverDto): Promise<ResponseInterface> {
     try {
       const dispatcher = await this.userRepo.findOneByOrFail({ id });

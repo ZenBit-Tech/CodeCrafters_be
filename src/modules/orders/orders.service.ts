@@ -21,14 +21,30 @@ export class OrdersService {
     companyId,
     search,
     isNew,
+    startDate,
   }: OrderServiceParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
+    let dateFromServer;
+    let startOfDay;
+    let endOfDay;
+
+    if (startDate) {
+      dateFromServer = new Date(startDate);
+      startOfDay = new Date(dateFromServer.getFullYear(), dateFromServer.getMonth(), dateFromServer.getDate());
+      endOfDay = new Date(dateFromServer.getFullYear(), dateFromServer.getMonth(), dateFromServer.getDate(), 23, 59, 59, 999);
+    }
+
+    const collectionDateCondition = {
+      collection_date: startDate ? Between(startOfDay, endOfDay) : Not(IsNull()),
+    };
+
     const findSettings: FindManyOptions<Order> = {
       skip: (page - 1) * ORDER_PAGE_LENGTH,
       take: ORDER_PAGE_LENGTH,
-      relations: ['luggages'],
+      relations: ['luggages', 'route'],
       where: search
         ? [
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               route: isNew ? IsNull() : {},
@@ -37,12 +53,14 @@ export class OrdersService {
               },
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               collection_address: Like(`%${search}%`),
               route: isNew ? IsNull() : {},
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               luggages: {
@@ -51,6 +69,7 @@ export class OrdersService {
               route: isNew ? IsNull() : {},
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               customer: {
@@ -59,6 +78,7 @@ export class OrdersService {
               route: isNew ? IsNull() : {},
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               customer: {
@@ -67,6 +87,7 @@ export class OrdersService {
               route: isNew ? IsNull() : {},
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               route: {
@@ -74,6 +95,7 @@ export class OrdersService {
               },
             },
             {
+              ...collectionDateCondition,
               status: OrderStatuses[filterBy],
               company: { id: companyId },
               route: {
@@ -87,7 +109,12 @@ export class OrdersService {
               route: isNew ? IsNull() : {},
             },
           ]
-        : { status: OrderStatuses[filterBy], company: { id: companyId }, route: isNew ? IsNull() : {} },
+        : {
+            ...collectionDateCondition,
+            status: OrderStatuses[filterBy],
+            company: { id: companyId },
+            route: isNew ? IsNull() : {},
+          },
       order: { ...(<Record<string, string>>JSON.parse(sortBy)) },
     };
 
@@ -133,9 +160,20 @@ export class OrdersService {
         acc[collectionDateKey] = (acc[collectionDateKey] || 0) + 1;
         return acc;
       }, {});
+    } catch (error: unknown) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async findByIds(arrayOfId: number[]): Promise<Order[]> {
+    try {
+      const query = this.orderRepository
+        .createQueryBuilder('order')
+        .where('order.id IN (:...ids)', { ids: arrayOfId })
+        .orderBy('order.collection_date', 'ASC');
+      return await query.getMany();
     } catch (error) {
-      console.error('Error fetching dates:', error);
-      throw new InternalServerErrorException('Failed to fetch dates');
+      throw new InternalServerErrorException('Internal server error');
     }
   }
 }

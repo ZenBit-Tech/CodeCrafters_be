@@ -7,6 +7,7 @@ export interface OrderQueryParams {
   page: number;
   companyId: number;
   isNew: 'true' | 'false';
+  startDate: Date;
 }
 
 export interface OrderServiceParams {
@@ -16,4 +17,5 @@ export interface OrderServiceParams {
   page: number;
   companyId: number;
   isNew: boolean;
+  startDate: Date | undefined;
 }
