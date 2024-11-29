@@ -34,7 +34,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Validate token' })
   @ApiResponse({ status: 200, type: ValidateResponse })
   @ApiResponse({ status: 400, type: BadRequestResponseDto })
-  validateAccessToken(@Headers('role') role: Roles, @Headers('authorization') authorization: string): { token: string; role: Roles } {
+  async validateAccessToken(
+    @Headers('role') role: Roles,
+    @Headers('authorization') authorization: string,
+  ): Promise<{ token: string; role: Roles; companyId: number }> {
     return this.authService.tokenValidation(authorization, role);
   }
 

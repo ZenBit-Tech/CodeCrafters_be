@@ -1,11 +1,12 @@
-import { CanActivate, ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { Repository } from 'typeorm';
+
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
 export interface AccessTokenInterface {
   fullName: string;
@@ -18,6 +19,7 @@ interface RequestWithUser extends Request {
   user?: AccessTokenInterface;
 }
 
+@Injectable()
 export class UserCompanyGuard implements CanActivate {
   constructor(
     @InjectRepository(User)
@@ -26,7 +28,7 @@ export class UserCompanyGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: RequestWithUser = context.switchToHttp().getRequest();
-    const authorizationHeader = request.headers.authorization;
+    const { authorization: authorizationHeader } = request.headers;
 
     if (!authorizationHeader) {
       throw new UnauthorizedException('Authorization token is missing');
@@ -40,18 +42,38 @@ export class UserCompanyGuard implements CanActivate {
     }
 
     try {
-      const decodedToken = <AccessTokenInterface>jwt.verify(token, jwtSecret);
-      request.user = decodedToken;
+      const decodedToken = <jwt.JwtPayload>jwt.verify(token, jwtSecret);
+
+      const { email } = decodedToken;
+
+      if (typeof email !== 'string') {
+        throw new UnauthorizedException('Invalid token payload');
+      }
+
+      const user = await this.userRepo.findOneOrFail({
+        where: { email },
+        relations: ['company_id'],
+      });
+
+      request.user = {
+        fullName: user.full_name,
+        email: user.email,
+        role: user.role,
+        company_id: user.company_id,
+      };
 
       if (request.method === 'POST') {
-        if (request.body.company_id !== decodedToken.company_id.id) {
+        if (request.body.company_id !== user.company_id.id) {
           throw new ForbiddenException('You are not allowed to access this company');
         }
       } else if (request.method === 'GET' && !request.params['id']) {
         return true;
       } else {
-        const user = await this.userRepo.findOneByOrFail({ id: +request.params['id'] });
-        if (user.company_id.id !== decodedToken.company_id.id) {
+        const targetUser = await this.userRepo.findOneOrFail({
+          where: { id: +request.params['id'] },
+          relations: ['company_id'],
+        });
+        if (targetUser.company_id.id !== user.company_id.id) {
           throw new ForbiddenException('You are not allowed to access this user');
         }
       }
