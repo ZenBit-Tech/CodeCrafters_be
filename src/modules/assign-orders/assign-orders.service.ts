@@ -11,12 +11,6 @@ export interface RoutesInform {
   }[];
 }
 
-// interface Assignment {
-//   driver: User;
-//   orders: Order[];
-//   notAssignedOrders: Order[];
-// }
-
 @Injectable()
 export class AssignOrdersService {
   constructor(

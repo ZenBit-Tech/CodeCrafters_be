@@ -164,16 +164,4 @@ export class OrdersService {
       throw new InternalServerErrorException(error);
     }
   }
-
-  async findByIds(arrayOfId: number[]): Promise<Order[]> {
-    try {
-      const query = this.orderRepository
-        .createQueryBuilder('order')
-        .where('order.id IN (:...ids)', { ids: arrayOfId })
-        .orderBy('order.collection_date', 'ASC');
-      return await query.getMany();
-    } catch (error) {
-      throw new InternalServerErrorException('Internal server error');
-    }
-  }
 }
