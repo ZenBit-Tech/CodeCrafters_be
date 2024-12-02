@@ -2,14 +2,8 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
+import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { Repository } from 'typeorm';
-
-export interface RoutesInform {
-  value: {
-    driver: User;
-    orders: Order[];
-  }[];
-}
 
 @Injectable()
 export class AssignOrdersService {
@@ -20,10 +14,7 @@ export class AssignOrdersService {
     private readonly orderRepo: Repository<Order>,
   ) {}
 
-  private assignOrdersToDrivers(
-    drivers: User[],
-    orders: Order[],
-  ): { value: { driver: User; orders: Order[] }[]; notAssignedOrders: Order[] } {
+  private assignOrdersToDrivers(drivers: User[], orders: Order[]): AssignedOrdersResponse {
     orders.sort((a, b) => new Date(a.collection_time_start).getTime() - new Date(b.collection_time_start).getTime());
     const assignments: { driver: User; orders: Order[] }[] = drivers.map((driver) => ({
       driver,
@@ -60,7 +51,7 @@ export class AssignOrdersService {
     };
   }
 
-  async getAndAssign(driversIds: number[], ordersIds: number[]): Promise<RoutesInform> {
+  async getAndAssign(driversIds: number[], ordersIds: number[]): Promise<AssignedOrdersResponse> {
     try {
       const getOdersQuery = this.orderRepo
         .createQueryBuilder('order')
