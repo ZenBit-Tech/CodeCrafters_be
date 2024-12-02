@@ -1,9 +1,11 @@
-import { Controller, Post, Body, UseGuards, SetMetadata, BadRequestException, Get, ParseArrayPipe, Query } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, SetMetadata, BadRequestException, Get, ParseArrayPipe, Query, Param } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Route } from 'common/database/entities/route.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
+import { FailedResponse } from 'common/types/failed-response.dto';
 import { SuccessResponse } from 'common/types/response-success.dto';
+import { RouteInform } from 'common/types/routeInformResponse';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { RouteService } from './route.service';
@@ -20,6 +22,16 @@ export class RouteController {
   @ApiResponse({ status: 201, example: { status: 201, message: 'Routes created successfully' } })
   async create(@Body() createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
     return this.routeService.create(createRouteDto);
+  }
+
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Route route details' })
+  @ApiResponse({ status: 200, example: { status: 200, type: Route } })
+  @ApiResponse({ status: 400, type: FailedResponse })
+  async getRouteDetails(@Param('id') id: number): Promise<RouteInform> {
+    return this.routeService.getOne(+id);
   }
 
   @UseGuards(RolesGuard)
