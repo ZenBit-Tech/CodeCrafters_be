@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Route } from 'common/database/entities/route.entity';
+import { SortOrder } from 'common/enums/enums';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { transformRouteObject } from 'common/utils/transformRouteObject';
@@ -80,7 +81,7 @@ export class RouteService {
     stopsCount?: number[],
     statuses?: string[],
   ) {
-    const sortOrder = sortDirection === 'asc' ? 'ASC' : 'DESC';
+    const sortOrder: SortOrder = sortDirection === 'asc' ? SortOrder.ASC : SortOrder.DESC;
 
     const validSortFields = ['id', 'submission_date', 'user_id.full_name', 'distance', 'route_time', 'ordersCount'];
     const isRouteTimeSort = sortField === 'route_time';

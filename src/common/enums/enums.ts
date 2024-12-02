@@ -27,3 +27,8 @@ export enum RouteStatuses {
   ON_TIME = 'On Time',
   FAILED = 'Failed',
 }
+
+export enum SortOrder {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
