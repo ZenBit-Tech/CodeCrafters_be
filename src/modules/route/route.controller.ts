@@ -24,18 +24,8 @@ export class RouteController {
     return this.routeService.create(createRouteDto);
   }
 
-  @Get(':id')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
-  @ApiOperation({ summary: 'Route route details' })
-  @ApiResponse({ status: 200, example: { status: 200, type: Route } })
-  @ApiResponse({ status: 400, type: FailedResponse })
-  async getRouteDetails(@Param('id') id: number): Promise<RouteInform> {
-    return this.routeService.getOne(+id);
-  }
-
-  @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.SUPERADMIN])
   @Get('list-filters')
   @ApiOperation({ summary: 'Get unique filters (drivers, stops, statuses) for dropdowns' })
   @ApiResponse({ status: 200, description: 'Unique filter values retrieved', type: Object })
@@ -54,7 +44,7 @@ export class RouteController {
   }
 
   @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.SUPERADMIN])
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
   @Get('by-dates')
   @ApiResponse({ status: 200, description: 'Routes found', type: [Route] })
   @ApiResponse({ status: 404, description: 'No routes found' })
@@ -81,5 +71,15 @@ export class RouteController {
     }
 
     return this.routeService.getRoutesByDateRange(start, end, sortField, sortDirection, searchQuery, drivers, stopsCount, statuses);
+  }
+
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Route route details' })
+  @ApiResponse({ status: 200, example: { status: 200, type: Route } })
+  @ApiResponse({ status: 400, type: FailedResponse })
+  async getRouteDetails(@Param('id') id: number): Promise<RouteInform> {
+    return this.routeService.getOne(+id);
   }
 }
