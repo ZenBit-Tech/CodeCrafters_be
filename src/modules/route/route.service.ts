@@ -6,6 +6,7 @@ import { EntityManager, Repository } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
+import { FilterData, RouteData } from './types';
 
 @Injectable()
 export class RouteService {
@@ -29,17 +30,26 @@ export class RouteService {
     }
   }
 
-  async getRouteById(id: number): Promise<Route> {
-    const route = await this.routeRepo.findOne({
-      where: { id },
-      relations: ['user_id', 'company_id'],
-    });
+  async getRouteFilters(startDate: Date, endDate: Date) {
+    const filters = await this.routeRepo
+      .createQueryBuilder('route')
+      .select(['DISTINCT user.full_name AS driver', 'COUNT(order.id) AS stopsCount', 'route.status AS status'])
+      .leftJoin('route.user_id', 'user')
+      .leftJoin('route.orders', 'order')
+      .where('route.submission_date BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .groupBy('user.full_name, route.status')
+      .addGroupBy('route.status')
+      .getRawMany<FilterData>();
 
-    if (!route) {
-      throw new NotFoundException(`Route with ID ${id} not found`);
-    }
+    const uniqueDrivers = Array.from(new Set(filters.map((filter) => filter.driver)));
+    const uniqueStops = Array.from(new Set(filters.map((filter) => filter.stopsCount)));
+    const uniqueStatuses = Array.from(new Set(filters.map((filter) => filter.status)));
 
-    return route;
+    return {
+      drivers: uniqueDrivers,
+      stops: uniqueStops,
+      statuses: uniqueStatuses,
+    };
   }
 
   async getRoutesByDateRange(
@@ -51,10 +61,10 @@ export class RouteService {
     drivers?: string[],
     stopsCount?: number[],
     statuses?: string[],
-  ): Promise<Route[]> {
+  ) {
     const sortOrder = sortDirection === 'asc' ? 'ASC' : 'DESC';
 
-    const validSortFields = ['id', 'submission_date', 'user_id.full_name', 'distance', 'route_time'];
+    const validSortFields = ['id', 'submission_date', 'user_id.full_name', 'distance', 'route_time', 'ordersCount'];
     const isRouteTimeSort = sortField === 'route_time';
 
     if (!validSortFields.includes(sortField)) {
@@ -65,7 +75,10 @@ export class RouteService {
       .createQueryBuilder('route')
       .leftJoinAndSelect('route.user_id', 'user')
       .leftJoinAndSelect('route.company_id', 'company')
-      .where('route.submission_date BETWEEN :startDate AND :endDate', { startDate, endDate });
+      .leftJoin('route.orders', 'order')
+      .where('route.submission_date BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .addSelect('COUNT(order.id)', 'ordersCount')
+      .groupBy('route.id');
 
     if (searchQuery) {
       queryBuilder.andWhere('user.full_name LIKE :searchQuery', { searchQuery: `%${searchQuery}%` });
@@ -76,7 +89,7 @@ export class RouteService {
     }
 
     if (stopsCount && stopsCount.length > 0) {
-      queryBuilder.andWhere('route.stopsCount IN (:...stopsCount)', { stopsCount });
+      queryBuilder.having('COUNT(order.id) IN (:...stopsCount)', { stopsCount });
     }
 
     if (statuses && statuses.length > 0) {
@@ -85,13 +98,15 @@ export class RouteService {
 
     if (isRouteTimeSort) {
       queryBuilder
-        .addSelect(`TIMESTAMPDIFF(MINUTE, route.submission_date, route.arrival_date) AS routeMinutes`)
+        .addSelect(`TIMESTAMPDIFF(MINUTE, route.submission_date, route.arrival_date)`, 'routeMinutes')
         .orderBy('routeMinutes', sortOrder);
+    } else if (sortField === 'ordersCount') {
+      queryBuilder.orderBy('ordersCount', sortOrder);
     } else {
       queryBuilder.orderBy(sortField === 'user_id.full_name' ? 'user.full_name' : `route.${sortField}`, sortOrder);
     }
 
-    const routes = await queryBuilder.getMany();
+    const routes = await queryBuilder.getRawMany<RouteData>();
 
     if (!routes.length) {
       if (searchQuery) {

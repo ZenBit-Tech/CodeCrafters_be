@@ -1,16 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  SetMetadata,
-  BadRequestException,
-  Get,
-  Param,
-  ParseArrayPipe,
-  ParseIntPipe,
-  Query,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, SetMetadata, BadRequestException, Get, ParseArrayPipe, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Route } from 'common/database/entities/route.entity';
 import { Roles } from 'common/enums/enums';
@@ -19,6 +7,7 @@ import { SuccessResponse } from 'common/types/response-success.dto';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { RouteService } from './route.service';
+import { RouteData } from './types';
 
 @Controller('route')
 export class RouteController {
@@ -31,6 +20,25 @@ export class RouteController {
   @ApiResponse({ status: 201, example: { status: 201, message: 'Routes created successfully' } })
   async create(@Body() createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
     return this.routeService.create(createRouteDto);
+  }
+
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.SUPERADMIN])
+  @Get('list-filters')
+  @ApiOperation({ summary: 'Get unique filters (drivers, stops, statuses) for dropdowns' })
+  @ApiResponse({ status: 200, description: 'Unique filter values retrieved', type: Object })
+  async getRouteFilters(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ): Promise<{ drivers: string[]; stops: number[]; statuses: string[] }> {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      throw new BadRequestException('Invalid date format. Use YYYY-MM-DD.');
+    }
+
+    return this.routeService.getRouteFilters(start, end);
   }
 
   @UseGuards(RolesGuard)
@@ -50,23 +58,16 @@ export class RouteController {
     @Query('sortDirection') sortDirection: 'asc' | 'desc',
     @Query('searchQuery') searchQuery?: string,
     @Query('drivers', new ParseArrayPipe({ items: String, optional: true })) drivers?: string[],
-  ): Promise<Route[]> {
+    @Query('stopsCount', new ParseArrayPipe({ items: Number, optional: true })) stopsCount?: number[],
+    @Query('statuses', new ParseArrayPipe({ items: String, optional: true })) statuses?: string[],
+  ): Promise<RouteData[]> {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
       throw new BadRequestException('Invalid date format. Use YYYY-MM-DD.');
     }
 
-    return this.routeService.getRoutesByDateRange(start, end, sortField, sortDirection, searchQuery, drivers);
-  }
-
-  @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.SUPERADMIN])
-  @Get(':id')
-  @ApiResponse({ status: 200, description: 'Route found', type: Route })
-  @ApiResponse({ status: 404, description: 'Route not found' })
-  async getRouteById(@Param('id', ParseIntPipe) id: number): Promise<Route> {
-    return this.routeService.getRouteById(id);
+    return this.routeService.getRoutesByDateRange(start, end, sortField, sortDirection, searchQuery, drivers, stopsCount, statuses);
   }
 }
