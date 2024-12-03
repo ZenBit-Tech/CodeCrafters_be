@@ -13,7 +13,6 @@ import { CompanyModule } from 'modules/company/company.module';
 
 import { DatabaseModule } from './common/database/database.module';
 import { MailerModule } from './common/mailer/mailer.module';
-import { AssignOrdersModule } from './modules/assign-orders/assign-orders.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ModuleExampleModule } from './modules/module-example/module-example.module';
 import { OrdersModule } from './modules/orders/orders.module';
@@ -32,7 +31,6 @@ import { UserModule } from './modules/user/user.module';
     CompanyModule,
     OrdersModule,
     RouteModule,
-    AssignOrdersModule,
   ],
   controllers: [],
   providers: [],
