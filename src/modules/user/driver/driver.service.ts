@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
@@ -23,9 +23,25 @@ export class DriverService {
     try {
       const company = await this.companyRepo.findOneByOrFail({ id: createDriverDto.company_id });
 
+      const existingUser = await this.userRepo.findOne({
+        where: [{ email: createDriverDto.email }, { phone_number: createDriverDto.phone_number }],
+      });
+
+      if (existingUser) {
+        if (existingUser.email === createDriverDto.email) {
+          throw new ConflictException('Email already exists');
+        }
+        if (existingUser.phone_number === createDriverDto.phone_number) {
+          throw new ConflictException('Phone number already exists');
+        }
+      }
+
       const dispatcher = this.userRepo.create({ ...createDriverDto, company_id: company });
       return await this.entityManager.save(dispatcher);
     } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
       throw new InternalServerErrorException('Internal server error');
     }
   }
