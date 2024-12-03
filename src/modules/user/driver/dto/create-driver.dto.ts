@@ -24,6 +24,11 @@ export class CreateDriverDto {
 
   @Expose()
   @IsString()
+  @ApiProperty({ example: '+380987654321', description: 'driver phone number in international format' })
+  phone_number: string;
+
+  @Expose()
+  @IsString()
   @ApiProperty({ example: Roles.DRIVER, description: 'driver role' })
   role: Roles.DRIVER;
 
