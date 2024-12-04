@@ -5,4 +5,5 @@ export interface UserQueryParams {
   role?: Roles;
   page?: number;
   search?: string;
+  companyId: number;
 }

@@ -13,7 +13,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(queryParams: UserQueryParams, companyId: number): Promise<{ users: User[]; page: number; pagesCount: number }> {
+  async findAll(queryParams: UserQueryParams): Promise<{ users: User[]; page: number; pagesCount: number }> {
     const { sortBy, role, page = 1, search = '' } = queryParams;
 
     const pageNumber: number = Math.max(Number(page), 1);
@@ -25,7 +25,7 @@ export class UserService {
     const whereCondition: FindOptionsWhere<User> = {
       ...(search && { full_name: Like(`%${search}%`) }),
       ...(role && { role }),
-      company_id: { id: companyId },
+      company_id: { id: queryParams.companyId },
     };
 
     const findSettings: FindManyOptions<User> = {

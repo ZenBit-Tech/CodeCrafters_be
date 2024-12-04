@@ -1,40 +1,27 @@
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
-
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const requiredRoles: string[] = this.reflector.get<string[]>('roles', context.getHandler());
     const request: Request = context.switchToHttp().getRequest();
 
     if (!request.headers.authorization) {
-      throw new UnauthorizedException('Auth token is missing');
+      throw new UnauthorizedException('Auth token is missing in the request headers');
     }
 
-    const token = request.headers.authorization.split(' ')[1];
-    const jwtSecret = process.env['JWT_SECRET'];
+    const decodedAccessToken = <{ role: string }>jwt.decode(request.headers.authorization);
 
-    if (!jwtSecret) {
-      throw new UnauthorizedException('JWT secret not configured');
+    if (decodedAccessToken.role) {
+      return requiredRoles.some((role: string) => role === decodedAccessToken.role);
     }
 
-    try {
-      const decodedAccessToken = <jwt.JwtPayload>jwt.verify(token, jwtSecret);
-
-      const { role: roleInToken } = decodedAccessToken;
-
-      if (typeof roleInToken !== 'string') {
-        throw new UnauthorizedException('Invalid token');
-      }
-
-      return requiredRoles.includes(roleInToken);
-    } catch (error) {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
+    throw new UnauthorizedException('Auth token is invalid');
   }
 }

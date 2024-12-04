@@ -1,33 +1,30 @@
-import { Request } from 'express';
-import * as jwt from 'jsonwebtoken';
-
 import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Roles } from 'common/enums/enums';
+import { Request } from 'express';
+import * as jwt from 'jsonwebtoken';
+import { Observable } from 'rxjs';
+
+interface AccessToken extends jwt.Jwt {
+  role: Roles;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly configService: ConfigService) {}
-
-  canActivate(context: ExecutionContext): boolean {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request: Request = context.switchToHttp().getRequest();
 
-    const { authorization: accessToken } = request.headers;
-    if (!accessToken) throw new BadRequestException('No access token provided');
+    const accessToken = request.headers.authorization;
+    if (!accessToken) throw new BadRequestException('there is no accessToken');
 
-    try {
-      const decodedToken = <jwt.JwtPayload>jwt.verify(accessToken as string, this.configService.getOrThrow('JWT_SECRET'));
+    const isTokenValid = jwt.verify(accessToken, this.configService.getOrThrow('JWT_SECRET'));
+    if (!isTokenValid) throw new BadRequestException('there is no accessToken or token is invalid');
 
-      const { role } = decodedToken;
+    const decodedToken = <AccessToken>jwt.decode(accessToken);
 
-      if (typeof role !== 'string') {
-        throw new BadRequestException('Invalid token payload');
-      }
+    request.headers['role'] = decodedToken.role;
 
-      request.headers['role'] = role;
-
-      return true;
-    } catch (error) {
-      throw new BadRequestException('Invalid or expired token');
-    }
+    return true;
   }
 }

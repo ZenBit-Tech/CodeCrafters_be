@@ -31,16 +31,8 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  async findAll(@Query() queryParams: UserQueryParams, @Req() req: RequestWithUser): Promise<UserResponseDto> {
-    const { user } = req;
-
-    if (!user.company_id.id) {
-      throw new BadRequestException('User information is missing');
-    }
-
-    const { users, page, pagesCount } = await this.userService.findAll(queryParams, user.company_id.id);
-
-    return { users, page, pagesCount };
+  async findAll(@Query() queryParams: UserQueryParams): Promise<UserResponseDto> {
+    return this.userService.findAll(queryParams);
   }
 
   @Delete(':id')
