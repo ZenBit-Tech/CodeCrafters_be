@@ -1,17 +1,12 @@
-import { BadRequestException, Controller, Delete, Get, Param, Query, Req, SetMetadata, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
-import { AccessTokenInterface, UserCompanyGuard } from 'common/guards/userCompany.guard';
-import { Request } from 'express';
+import { UserCompanyGuard } from 'common/guards/userCompany.guard';
 
 import { UserResponseDto } from './dto/users-response.dto';
 import { UserQueryParams } from './types';
 import { UserService } from './user.service';
-
-interface RequestWithUser extends Request {
-  user: AccessTokenInterface;
-}
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -42,13 +37,7 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  async remove(@Param('id') id: number, @Req() req: RequestWithUser): Promise<{ message: string }> {
-    const { user } = req;
-
-    if (!user.company_id.id) {
-      throw new BadRequestException('User information is missing');
-    }
-
+  async remove(@Param('id') id: number): Promise<{ message: string }> {
     await this.userService.deleteUser(id);
     return { message: `User with ID ${id} deleted successfully` };
   }

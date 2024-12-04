@@ -80,6 +80,8 @@ export class DriverService {
     try {
       const dispatcher = await this.userRepo.findOneByOrFail({ id });
 
+      console.log(dispatcher);
+
       await this.userRepo.delete(id);
       return { status: 200, message: `Dispatcher ${dispatcher.full_name} account deleted successfully` };
     } catch (error) {

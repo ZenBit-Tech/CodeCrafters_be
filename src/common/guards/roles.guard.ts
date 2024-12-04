@@ -16,7 +16,9 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException('Auth token is missing in the request headers');
     }
 
-    const decodedAccessToken = <{ role: string }>jwt.decode(request.headers.authorization);
+    const decodedAccessToken = <{ role: string }>(
+      jwt.decode(request.headers.authorization.split(' ')[request.headers.authorization.split(' ').length - 1])
+    );
 
     if (decodedAccessToken.role) {
       return requiredRoles.some((role: string) => role === decodedAccessToken.role);
