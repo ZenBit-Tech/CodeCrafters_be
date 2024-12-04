@@ -32,15 +32,6 @@ export class DriverController {
     return this.driverService.findAll(sortBy, search, companyId);
   }
 
-  @Get('by-ids')
-  @UseGuards(RolesGuard, UserCompanyGuard)
-  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
-  @ApiOperation({ summary: 'Get drivers by list of id' })
-  @ApiResponse({ status: 200, type: [User] })
-  async getDriversByListOfId(@Query() { listOfId }: { listOfId: number[] }): Promise<User[]> {
-    return this.driverService.findByListOfId(listOfId);
-  }
-
   @Get(':id')
   @UseGuards(RolesGuard, UserCompanyGuard)
   @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])

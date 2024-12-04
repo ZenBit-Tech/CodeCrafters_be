@@ -1,9 +1,11 @@
 import { Controller, Get, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
+import { User } from 'common/database/entities/user.entity';
+import { ParseAssignOrdersJson } from 'common/decorators/parseJsonDecorator';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
-import { UserCompanyGuard } from 'common/guards/userCompany.guard';
+import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { FailedResponse } from 'common/types/failed-response.dto';
 import { stringToBoolean } from 'common/utils/stringToBoolean';
 
@@ -62,20 +64,15 @@ export class OrdersController {
     return this.ordersService.getDates(date, companyId);
   }
 
-  @Get('by-ids')
-  @UseGuards(RolesGuard, UserCompanyGuard)
-  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
-  @ApiQuery({ name: 'array of id', description: 'array of orders id', example: [1, 2, 3, 4, 5] })
-  @ApiResponse({
-    status: 200,
-    description: 'Orders array',
-    type: [Order],
-  })
-  @ApiResponse({
-    status: 500,
-    type: FailedResponse,
-  })
-  async findByIds(@Query() { ordersIdArray }: { ordersIdArray: string }): Promise<Order[]> {
-    return this.ordersService.findByIds(<number[]>JSON.parse(ordersIdArray));
+  @Get('assign-orders')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Get assigned orders for the selected drivers' })
+  @ApiResponse({ status: 200, example: { value: [{ driver: User, orders: [Order] }], notAssignedOrders: [Order] } })
+  @ApiResponse({ status: 500, type: FailedResponse })
+  async createRoutes(
+    @ParseAssignOrdersJson() { driversIds, ordersIds }: { driversIds: number[]; ordersIds: number[] },
+  ): Promise<AssignedOrdersResponse> {
+    return this.ordersService.getAndAssign(driversIds, ordersIds);
   }
 }
