@@ -75,4 +75,15 @@ export class OrdersController {
   ): Promise<AssignedOrdersResponse> {
     return this.ordersService.getAndAssign(driversIds, ordersIds);
   }
+
+  @Get('new-orders-count')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiQuery({ name: 'companyId', description: 'ID of the company', example: 1 })
+  @ApiResponse({ status: 200, description: 'Number of new orders', example: 5 })
+  @ApiResponse({ status: 404, description: 'Company not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  async getNewOrdersCount(@Query('companyId') companyId: number): Promise<number> {
+    return this.ordersService.getNewOrdersCount(companyId);
+  }
 }
