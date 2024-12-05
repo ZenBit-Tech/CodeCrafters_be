@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MAX_DATE, ORDER_PAGE_LENGTH } from 'common/constants/numbers';
+import { Company } from 'common/database/entities/company.entity';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
-import { Company } from 'common/database/entities/company.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
 import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
@@ -18,7 +18,7 @@ export class OrdersService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     @InjectRepository(Company)
-    private readonly CompanyRepository: Repository<Company>,
+    private readonly companyRepository: Repository<Company>,
   ) {}
 
   async findAll({
@@ -229,22 +229,23 @@ export class OrdersService {
 
   async getNewOrdersCount(companyId: number): Promise<number> {
     try {
-      const companyExists = await this.CompanyRepository.findOne({ where: { id: companyId } });
+      const TODAY_START = new Date();
+      TODAY_START.setHours(0, 0, 0, 0);
+
+      const companyExists = await this.companyRepository.findOne({ where: { id: companyId } });
 
       if (!companyExists) {
         throw new NotFoundException(`Company with ID ${companyId} not found`);
       }
 
-      const count = await this.orderRepository.count({
+      return await this.orderRepository.count({
         where: {
-          collection_date: Between(new Date(), MAX_DATE),
+          collection_date: Between(TODAY_START, MAX_DATE),
           company: { id: companyId },
           route: { id: IsNull() },
         },
         relations: ['route'],
       });
-
-      return count;
     } catch (error) {
       throw new InternalServerErrorException('Failed to get new orders count');
     }
