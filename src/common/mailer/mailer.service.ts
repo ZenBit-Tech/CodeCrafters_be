@@ -11,12 +11,10 @@ export class MailerService {
 
   mailTransport(): nodemailer.Transporter<SMTPTransport.SentMessageInfo, SMTPTransport.Options> {
     return nodemailer.createTransport({
-      host: this.configService.getOrThrow<string>('MAIL_HOST'),
-      port: this.configService.getOrThrow<number>('MAIL_PORT'),
-      secure: false,
+      service: 'gmail',
       auth: {
-        user: this.configService.getOrThrow<string>('MAIL_USER'),
-        pass: this.configService.getOrThrow<string>('MAIL_PASSWORD'),
+        user: this.configService.get<string>('EMAIL_USER'),
+        pass: this.configService.get<string>('EMAIL_PASS'),
       },
     });
   }
