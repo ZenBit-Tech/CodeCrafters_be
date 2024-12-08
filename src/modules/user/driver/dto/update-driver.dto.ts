@@ -6,18 +6,21 @@ export class UpdateDriverDto {
   @Expose()
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'https://logo-path', description: 'dispatcher logo' })
-  logo: string;
+  @ApiProperty({
+    example: '+380931234567',
+    description: 'driver phone number',
+  })
+  phone_number: string;
 
   @Expose()
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'John Doe', description: 'dispatcher full name' })
+  @ApiProperty({ example: 'John Doe', description: 'driver full name' })
   full_name: string;
 
   @Expose()
   @IsString()
   @IsEmail()
-  @ApiProperty({ example: 'example@gmail.com', description: 'dispatcher email' })
+  @ApiProperty({ example: 'example@gmail.com', description: 'driver email' })
   email: string;
 }

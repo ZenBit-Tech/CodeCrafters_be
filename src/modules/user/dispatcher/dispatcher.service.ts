@@ -23,6 +23,7 @@ export class DispatcherService {
       const company = await this.companyRepo.findOneByOrFail({ id: createDispatcherDto.company_id });
 
       const dispatcher = this.userRepo.create({ ...createDispatcherDto, company_id: company });
+
       return await this.entityManager.save(dispatcher);
     } catch (error) {
       throw new InternalServerErrorException('Internal server error');

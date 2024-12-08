@@ -24,7 +24,9 @@ export class UserCompanyGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
 
     if (!request.headers.authorization) throw new Error();
-    const decodedToken = <AccessTokenInterface>jwt.decode(request.headers.authorization);
+    const decodedToken = <AccessTokenInterface>(
+      jwt.decode(request.headers.authorization.split(' ')[request.headers.authorization.split(' ').length - 1])
+    );
 
     try {
       if (request.method === 'POST') {
@@ -33,6 +35,7 @@ export class UserCompanyGuard implements CanActivate {
         return true;
       } else {
         const user = await this.userRepo.findOneByOrFail({ id: +request.params['id'] });
+
         if (user.company_id.id !== decodedToken.company_id.id) throw new Error();
       }
       return true;

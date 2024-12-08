@@ -10,10 +10,6 @@ export class User {
   @ApiProperty({ example: 1, description: 'user id' })
   id: number;
 
-  @Column({ default: '' })
-  @ApiProperty({ example: 'http://logo', description: 'user logo' })
-  logo: string;
-
   @Column({ nullable: false })
   @ApiProperty({ example: 'John Doe', description: 'user full name' })
   full_name: string;
@@ -28,7 +24,7 @@ export class User {
 
   @Column({ nullable: true })
   @ApiProperty({ example: '+1234567890', description: 'user phone number' })
-  phone_number?: string;
+  phone_number: string;
 
   @Column({ nullable: true })
   @ApiProperty({ example: '123456', description: 'OTP for driver authentication' })

@@ -50,8 +50,25 @@ export class AuthService {
     }
   }
 
-  tokenValidation(accessToken: string, role: Roles): { token: string; role: Roles } {
-    return { token: accessToken, role };
+  async tokenValidation(accessToken: string, role: Roles): Promise<{ token: string; role: Roles; companyId: number }> {
+    try {
+      const { email } = <jwt.JwtPayload>jwt.verify(accessToken, this.configService.getOrThrow('JWT_SECRET'));
+
+      if (typeof email !== 'string') {
+        throw new BadRequestException('Invalid token payload');
+      }
+
+      const user = await this.userRepo.findOneOrFail({
+        where: { email },
+        relations: ['company_id'],
+      });
+
+      const { id: companyId } = user.company_id;
+
+      return { token: accessToken, role, companyId };
+    } catch (error) {
+      throw new BadRequestException('Invalid token');
+    }
   }
 
   async authDriverByEmail(email: string): Promise<SuccessResponse> {

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Roles } from 'common/enums/enums';
 
 export class ValidateResponse {
@@ -19,4 +19,12 @@ export class ValidateResponse {
     description: 'Auth role',
   })
   role: Roles;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 1,
+    description: 'Company ID',
+  })
+  companyId: number;
 }

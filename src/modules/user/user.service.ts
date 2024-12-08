@@ -13,24 +13,19 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(queryParams: UserQueryParams, companyId: number): Promise<{ users: User[]; page: number; pagesCount: number }> {
-    const { sortBy, filterBy, page = 1, search = '' } = queryParams;
+  async findAll(queryParams: UserQueryParams): Promise<{ users: User[]; page: number; pagesCount: number }> {
+    const { sortBy, role, page = 1, search = '' } = queryParams;
 
-    const pageNumber: number = typeof page === 'number' ? page : 1;
+    const pageNumber: number = Math.max(Number(page), 1);
 
-    let parsedSortBy: Record<string, 'ASC' | 'DESC'> = { full_name: 'ASC' };
-    if (sortBy) {
-      try {
-        parsedSortBy = <Record<string, 'ASC' | 'DESC'>>JSON.parse(sortBy);
-      } catch (error) {
-        throw new BadRequestException('Invalid sortBy format');
-      }
-    }
+    const parsedSortBy: Record<string, 'ASC' | 'DESC'> = sortBy
+      ? <Record<string, 'ASC' | 'DESC'>>JSON.parse(sortBy)
+      : { createdAt: 'DESC' };
 
     const whereCondition: FindOptionsWhere<User> = {
       ...(search && { full_name: Like(`%${search}%`) }),
-      ...(filterBy && { role: filterBy }),
-      company_id: { id: companyId },
+      ...(role && { role }),
+      company_id: { id: queryParams.companyId },
     };
 
     const findSettings: FindManyOptions<User> = {
@@ -50,19 +45,17 @@ export class UserService {
     }
   }
 
-  create() {
-    return 'This action adds a new user';
-  }
+  async deleteUser(userId: number): Promise<void> {
+    try {
+      const user = await this.userRepository.findOne({ where: { id: userId } });
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+      if (!user) {
+        throw new BadRequestException(`User with ID ${userId} not found`);
+      }
 
-  update(id: number) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+      await this.userRepository.remove(user);
+    } catch (error) {
+      throw new InternalServerErrorException('Error deleting user');
+    }
   }
 }
