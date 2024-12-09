@@ -1,5 +1,15 @@
 import { RouteStatuses } from 'common/enums/enums';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 import { Company } from './company.entity';
 import { Order } from './order.entity';
@@ -30,7 +40,7 @@ export class Route {
   @JoinColumn()
   company_id: Company;
 
-  @OneToMany(() => Order, (order) => order.route, { cascade: true })
+  @OneToMany(() => Order, (order) => order.route, { cascade: true, onDelete: 'CASCADE' })
   orders: Order[];
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -38,6 +48,9 @@ export class Route {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamp' })
+  deletedAt: Date;
 
   constructor(entity: Partial<Route>) {
     Object.assign(this, entity);
