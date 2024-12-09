@@ -118,7 +118,7 @@ export class RouteController {
   }
 
   @Delete(':id')
-  async deleteRoute(@Param('id', ParseIntPipe) id: number) {
+  async deleteRoute(@Param('id', ParseIntPipe) id: number): Promise<SuccessResponse> {
     return this.routeService.deleteRoute(id);
   }
 }

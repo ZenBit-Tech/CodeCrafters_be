@@ -1,6 +1,8 @@
 import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
+import { ROUTE_START_POINT } from 'common/constants/strings';
 import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { SortOrder } from 'common/enums/enums';
@@ -21,6 +23,7 @@ export class RouteService {
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
     private readonly entityManager: EntityManager,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
@@ -161,7 +164,7 @@ export class RouteService {
   async calculateRouteDistance(cities: string[]) {
     try {
       const geocodeCity = async (city: string) => {
-        const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&format=json`;
+        const url = `${this.configService.getOrThrow('OPENSTREET_API')}/search?city=${encodeURIComponent(city)}&format=json`;
         const response = await axios.get(url);
         if (!response.data.length) throw new Error(`No results found for ${city}`);
         const { lat, lon } = <{ lat: number; lon: number }>response.data[0];
@@ -180,7 +183,7 @@ export class RouteService {
       if (validCities.length < 2) throw new Error('Not enough valid cities to calculate a route.');
 
       const coordinates = validCities.map((city) => `${city.lon},${city.lat}`).join(';');
-      const osrmUrl = `http://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full`;
+      const osrmUrl = `${this.configService.getOrThrow('CALCULATE_DISTANCE_LINK')}/${coordinates}?overview=full`;
       const routeResponse = await axios.get(osrmUrl);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const route = routeResponse.data.routes[0];
@@ -202,7 +205,6 @@ export class RouteService {
 
       const order = await this.orderRepo.findOneOrFail({ where: { id: orderId } });
       order.route = null;
-
       await this.entityManager.save(order);
 
       const updatedRoute = await this.routeRepo.findOneOrFail({ where: { id: routeId }, relations: ['orders'] });
@@ -211,7 +213,7 @@ export class RouteService {
         (orderData) => orderData.collection_address.split(',')[orderData.collection_address.split(',').length - 2],
       );
 
-      await this.calculateRouteDistance(['New York', ...cities]).then(async (result) => {
+      await this.calculateRouteDistance([ROUTE_START_POINT, ...cities]).then(async (result) => {
         if (result) {
           updatedRoute.distance = Math.ceil(result.distance / 1000);
           await this.entityManager.save(updatedRoute);
@@ -220,7 +222,7 @@ export class RouteService {
 
       return await this.getOne(routeId);
     } catch (error) {
-      throw new InternalServerErrorException();
+      throw new NotFoundException('There is no such order');
     }
   }
 
@@ -236,7 +238,7 @@ export class RouteService {
 
       return { status: 200, message: 'route deleted successfully' };
     } catch (error) {
-      throw new InternalServerErrorException('');
+      throw new NotFoundException('There is no such route');
     }
   }
 }
