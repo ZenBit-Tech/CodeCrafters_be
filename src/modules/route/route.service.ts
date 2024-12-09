@@ -184,6 +184,7 @@ export class RouteService {
 
       const coordinates = validCities.map((city) => `${city.lon},${city.lat}`).join(';');
       const osrmUrl = `${this.configService.getOrThrow('CALCULATE_DISTANCE_LINK')}/${coordinates}?overview=full`;
+
       const routeResponse = await axios.get(osrmUrl);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const route = routeResponse.data.routes[0];
@@ -228,7 +229,7 @@ export class RouteService {
 
   async deleteRoute(routeId: number): Promise<SuccessResponse> {
     try {
-      const deletedRoute: DeleteResult = await this.routeRepo.delete(routeId);
+      const deletedRoute: DeleteResult = await this.routeRepo.softDelete(routeId);
 
       if (deletedRoute.affected !== undefined && deletedRoute.affected !== null) {
         if (deletedRoute.affected < 1) throw new Error();
