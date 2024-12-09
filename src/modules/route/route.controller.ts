@@ -1,4 +1,17 @@
-import { Controller, Post, Body, UseGuards, SetMetadata, BadRequestException, Get, ParseArrayPipe, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  SetMetadata,
+  BadRequestException,
+  Get,
+  ParseArrayPipe,
+  Query,
+  Param,
+  Patch,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Route } from 'common/database/entities/route.entity';
 import { Roles } from 'common/enums/enums';
@@ -91,5 +104,15 @@ export class RouteController {
   @ApiResponse({ status: 400, type: FailedResponse })
   async getRouteDetailsForDriver(@Param('id') userId: number): Promise<RouteInform> {
     return this.routeService.getOneForDriver(+userId);
+  }
+
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Remove order from route' })
+  @ApiResponse({ status: 200, example: { status: 200, type: Route } })
+  @ApiResponse({ status: 400, type: FailedResponse })
+  async updateRoute(@Param('id', ParseIntPipe) id: number, @Query('orderId', ParseIntPipe) orderId: number): Promise<RouteInform> {
+    return this.routeService.removeOrderFromRoute(id, orderId);
   }
 }
