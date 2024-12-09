@@ -118,6 +118,11 @@ export class RouteController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Remove order from route' })
+  @ApiResponse({ status: 200, example: { status: 200, type: SuccessResponse } })
+  @ApiResponse({ status: 400, type: FailedResponse })
   async deleteRoute(@Param('id', ParseIntPipe) id: number): Promise<SuccessResponse> {
     return this.routeService.deleteRoute(id);
   }
