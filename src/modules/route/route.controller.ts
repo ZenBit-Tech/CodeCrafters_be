@@ -11,6 +11,7 @@ import {
   Param,
   Patch,
   ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Route } from 'common/database/entities/route.entity';
@@ -114,5 +115,10 @@ export class RouteController {
   @ApiResponse({ status: 400, type: FailedResponse })
   async updateRoute(@Param('id', ParseIntPipe) id: number, @Query('orderId', ParseIntPipe) orderId: number): Promise<RouteInform> {
     return this.routeService.removeOrderFromRoute(id, orderId);
+  }
+
+  @Delete(':id')
+  async deleteRoute(@Param('id', ParseIntPipe) id: number) {
+    return this.routeService.deleteRoute(id);
   }
 }

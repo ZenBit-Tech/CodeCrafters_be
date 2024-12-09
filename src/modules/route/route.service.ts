@@ -7,7 +7,7 @@ import { SortOrder } from 'common/enums/enums';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { transformRouteObject } from 'common/utils/transformRouteObject';
-import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
+import { DeleteResult, EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
@@ -221,6 +221,22 @@ export class RouteService {
       return await this.getOne(routeId);
     } catch (error) {
       throw new InternalServerErrorException();
+    }
+  }
+
+  async deleteRoute(routeId: number): Promise<SuccessResponse> {
+    try {
+      const deletedRoute: DeleteResult = await this.routeRepo.delete(routeId);
+
+      if (deletedRoute.affected !== undefined && deletedRoute.affected !== null) {
+        if (deletedRoute.affected < 1) throw new Error();
+      } else {
+        throw new Error();
+      }
+
+      return { status: 200, message: 'route deleted successfully' };
+    } catch (error) {
+      throw new InternalServerErrorException('');
     }
   }
 }
