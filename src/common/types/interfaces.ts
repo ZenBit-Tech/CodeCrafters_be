@@ -20,3 +20,12 @@ export interface ResponseInterface {
   message?: string;
   error?: unknown;
 }
+
+export interface OrderWithRouteAndCustomer {
+  orderId: number;
+  routeId: number;
+  collectionTimeStart: Date;
+  collectionTimeEnd: Date;
+  customerName: string;
+  customerPhone: string | null;
+}

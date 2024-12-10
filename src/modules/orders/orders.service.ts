@@ -5,6 +5,7 @@ import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
 import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
+import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
 import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
 
 import { OrderServiceParams } from './types';
@@ -221,6 +222,37 @@ export class OrdersService {
       return this.assignOrdersToDrivers(drivers, orders);
     } catch (error) {
       throw new InternalServerErrorException('something went wrong');
+    }
+  }
+
+  async getOrdersByDriverAndDate(driverId: number, date: Date): Promise<OrderWithRouteAndCustomer[]> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    try {
+      return await this.orderRepository
+        .createQueryBuilder('order')
+        .leftJoinAndSelect('order.route', 'route')
+        .leftJoinAndSelect('order.customer', 'customer')
+        .where('route.user_id = :driverId', { driverId })
+        .andWhere('order.collection_date BETWEEN :startOfDay AND :endOfDay', {
+          startOfDay,
+          endOfDay,
+        })
+        .select([
+          'order.id AS orderId',
+          'route.id AS routeId',
+          'order.collection_time_start AS collectionTimeStart',
+          'order.collection_time_end AS collectionTimeEnd',
+          'customer.full_name AS customerName',
+          'customer.phone_number AS customerPhone',
+        ])
+        .getRawMany<OrderWithRouteAndCustomer>();
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
     }
   }
 }
