@@ -67,7 +67,7 @@ export class OrdersController {
 
   @Get('assign-orders')
   @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.DISPATCHER])
+  @SetMetadata('roles', [Roles.DISPATCHER, Roles.ADMIN])
   @ApiOperation({ summary: 'Get assigned orders for the selected drivers' })
   @ApiResponse({ status: 200, example: { value: [{ driver: User, orders: [Order] }], notAssignedOrders: [Order] } })
   @ApiResponse({ status: 500, type: FailedResponse })
