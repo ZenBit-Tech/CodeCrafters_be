@@ -12,7 +12,7 @@ import { MailerService } from 'common/mailer/mailer.service';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { transformRouteObject } from 'common/utils/transformRouteObject';
-import { DeleteResult, EntityManager, EntityNotFoundError, In, Repository } from 'typeorm';
+import { DeleteResult, EntityManager, EntityNotFoundError, In, Repository, Between } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
@@ -268,6 +268,23 @@ export class RouteService {
       return { status: 200, message: 'route deleted successfully' };
     } catch (error) {
       throw new NotFoundException('There is no such route');
+    }
+  }
+
+  async getRoutesForRender(from: Date, to: Date): Promise<RouteInform[]> {
+    try {
+      const startDate = new Date(new Date(from).setHours(0, 0, 0, 0));
+      const endDate = new Date(to);
+      const routes = await this.routeRepo.find({
+        where: {
+          arrival_date: Between(startDate, endDate),
+        },
+        relations: ['orders'],
+      });
+
+      return routes.map((route) => transformRouteObject(route));
+    } catch (error) {
+      throw new InternalServerErrorException('');
     }
   }
 }
