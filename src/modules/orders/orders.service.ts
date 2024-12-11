@@ -1,6 +1,7 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
+import { MAX_DATE, ORDER_PAGE_LENGTH } from 'common/constants/numbers';
+import { Company } from 'common/database/entities/company.entity';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
@@ -17,6 +18,8 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @InjectRepository(Company)
+    private readonly companyRepository: Repository<Company>,
   ) {}
 
   async findAll({
@@ -222,6 +225,30 @@ export class OrdersService {
       return this.assignOrdersToDrivers(drivers, orders);
     } catch (error) {
       throw new InternalServerErrorException('something went wrong');
+    }
+  }
+
+  async getNewOrdersCount(companyId: number): Promise<number> {
+    try {
+      const TODAY_START = new Date();
+      TODAY_START.setHours(0, 0, 0, 0);
+
+      const companyExists = await this.companyRepository.findOne({ where: { id: companyId } });
+
+      if (!companyExists) {
+        throw new NotFoundException(`Company with ID ${companyId} not found`);
+      }
+
+      return await this.orderRepository.count({
+        where: {
+          collection_date: Between(TODAY_START, MAX_DATE),
+          company: { id: companyId },
+          route: { id: IsNull() },
+        },
+        relations: ['route'],
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to get new orders count');
     }
   }
 
