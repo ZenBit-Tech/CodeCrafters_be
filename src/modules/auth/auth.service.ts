@@ -10,6 +10,8 @@ import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import { Repository } from 'typeorm';
 
+import { AuthDriverOtpResponseDto } from './dto/auth-driver-otp-response.dto';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -50,8 +52,25 @@ export class AuthService {
     }
   }
 
-  tokenValidation(accessToken: string, role: Roles): { token: string; role: Roles } {
-    return { token: accessToken, role };
+  async tokenValidation(accessToken: string, role: Roles): Promise<{ token: string; role: Roles; companyId: number }> {
+    try {
+      const { email } = <jwt.JwtPayload>jwt.verify(accessToken, this.configService.getOrThrow('JWT_SECRET'));
+
+      if (typeof email !== 'string') {
+        throw new BadRequestException('Invalid token payload');
+      }
+
+      const user = await this.userRepo.findOneOrFail({
+        where: { email },
+        relations: ['company_id'],
+      });
+
+      const { id: companyId } = user.company_id;
+
+      return { token: accessToken, role, companyId };
+    } catch (error) {
+      throw new BadRequestException('Invalid token');
+    }
   }
 
   async authDriverByEmail(email: string): Promise<SuccessResponse> {
@@ -95,7 +114,7 @@ export class AuthService {
     }
   }
 
-  async verifyDriverOtp(email: string, otp: string): Promise<{ token: string; role: Roles }> {
+  async verifyDriverOtp(email: string, otp: string): Promise<AuthDriverOtpResponseDto> {
     try {
       const user: User = await this.userRepo.findOneOrFail({ where: { email } });
 
@@ -126,7 +145,19 @@ export class AuthService {
         },
       );
 
-      return { token: accessToken, role };
+      return {
+        token: accessToken,
+        role,
+        user: {
+          id: user.id,
+          full_name: user.full_name,
+          email: user.email,
+          phone_number: user.phone_number,
+          companyId: user.company_id.id,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+      };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;

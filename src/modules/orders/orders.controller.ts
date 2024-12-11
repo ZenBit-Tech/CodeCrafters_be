@@ -7,6 +7,7 @@ import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
 import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { FailedResponse } from 'common/types/failed-response.dto';
+import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
 import { stringToBoolean } from 'common/utils/stringToBoolean';
 
 import { OrdersResponse } from './dto/response.dto';
@@ -66,7 +67,7 @@ export class OrdersController {
 
   @Get('assign-orders')
   @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.DISPATCHER])
+  @SetMetadata('roles', [Roles.DISPATCHER, Roles.ADMIN])
   @ApiOperation({ summary: 'Get assigned orders for the selected drivers' })
   @ApiResponse({ status: 200, example: { value: [{ driver: User, orders: [Order] }], notAssignedOrders: [Order] } })
   @ApiResponse({ status: 500, type: FailedResponse })
@@ -74,5 +75,32 @@ export class OrdersController {
     @ParseAssignOrdersJson() { driversIds, ordersIds }: { driversIds: number[]; ordersIds: number[] },
   ): Promise<AssignedOrdersResponse> {
     return this.ordersService.getAndAssign(driversIds, ordersIds);
+  }
+
+  @Get('by-driver')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DRIVER])
+  @ApiOperation({ summary: 'Get orders assigned for the driver on the selected date' })
+  @ApiQuery({ name: 'date', description: 'Date for handling orders only for assigned date', example: new Date().toISOString() })
+  @ApiQuery({ name: 'driverId', description: 'Driver id to get orders assigned to appropriate driver', example: 1 })
+  @ApiResponse({
+    status: 200,
+    example: {
+      orders: [
+        {
+          orderId: 1,
+          routeId: 1,
+          collectionTimeStart: new Date(),
+          collectionTimeEnd: new Date(),
+          customerName: 'Customer Name',
+          customerPhone: '+12345678',
+        },
+      ],
+    },
+  })
+  @ApiResponse({ status: 500, type: FailedResponse })
+  async findOrdersByDriverAndDate(@Query() { date, driverId }: { date: Date; driverId: number }): Promise<OrderWithRouteAndCustomer[]> {
+    const parsedDate = new Date(date);
+    return this.ordersService.getOrdersByDriverAndDate(driverId, parsedDate);
   }
 }

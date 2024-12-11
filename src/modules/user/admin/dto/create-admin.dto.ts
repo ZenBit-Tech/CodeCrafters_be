@@ -7,12 +7,6 @@ export class CreateAdminDto {
   @Expose()
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'https://logo-path', description: 'admin logo' })
-  logo: string;
-
-  @Expose()
-  @IsString()
-  @IsNotEmpty()
   @ApiProperty({ example: 'John Doe', description: 'admin full name' })
   full_name: string;
 

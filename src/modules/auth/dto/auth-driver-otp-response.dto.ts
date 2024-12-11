@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 import { Roles } from 'common/enums/enums';
 
-export class ValidateResponse {
+export class AuthDriverOtpResponseDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -20,11 +20,27 @@ export class ValidateResponse {
   })
   role: Roles;
 
-  @IsNumber()
+  @IsObject()
   @IsNotEmpty()
   @ApiProperty({
-    example: 1,
-    description: 'Company ID',
+    example: {
+      id: 1,
+      full_name: 'John Doe',
+      email: 'john@gmail.com',
+      phone_number: '+1234567890',
+      companyId: 1,
+      createdAt: '2024-12-09 20:55:07.564969',
+      updatedAt: '2024-12-09 20:55:07.564969',
+    },
+    description: 'Driver data',
   })
-  companyId: number;
+  user: {
+    id: number;
+    full_name: string;
+    email: string;
+    phone_number: string;
+    companyId: number;
+    createdAt: Date;
+    updatedAt: Date;
+  };
 }
