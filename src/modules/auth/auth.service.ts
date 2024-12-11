@@ -10,6 +10,8 @@ import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import { Repository } from 'typeorm';
 
+import { AuthDriverOtpResponseDto } from './dto/auth-driver-otp-response.dto';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -112,7 +114,7 @@ export class AuthService {
     }
   }
 
-  async verifyDriverOtp(email: string, otp: string): Promise<{ token: string; role: Roles }> {
+  async verifyDriverOtp(email: string, otp: string): Promise<AuthDriverOtpResponseDto> {
     try {
       const user: User = await this.userRepo.findOneOrFail({ where: { email } });
 
@@ -143,7 +145,19 @@ export class AuthService {
         },
       );
 
-      return { token: accessToken, role };
+      return {
+        token: accessToken,
+        role,
+        user: {
+          id: user.id,
+          full_name: user.full_name,
+          email: user.email,
+          phone_number: user.phone_number,
+          companyId: user.company_id.id,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+      };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;

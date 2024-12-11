@@ -6,6 +6,7 @@ import { AuthGuard } from 'common/guards/auth.guard';
 import { SuccessResponse } from 'common/types/response-success.dto';
 
 import { AuthService } from './auth.service';
+import { AuthDriverOtpResponseDto } from './dto/auth-driver-otp-response.dto';
 import { AuthDriverResponseDto } from './dto/auth-driver-response.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { BadRequestResponseDto } from './dto/bad-request.dto';
@@ -55,9 +56,9 @@ export class AuthController {
 
   @Post('driver/otp-verify')
   @ApiOperation({ summary: 'Verify OTP' })
-  @ApiResponse({ status: 200, type: ValidateResponse })
+  @ApiResponse({ status: 200, type: AuthDriverOtpResponseDto })
   @ApiResponse({ status: 400, type: BadRequestResponseDto })
-  async verifyOtp(@Body('email') email: string, @Body('otp') otp: string): Promise<{ token: string; role: Roles }> {
+  async verifyOtp(@Body('email') email: string, @Body('otp') otp: string): Promise<AuthDriverOtpResponseDto> {
     return this.authService.verifyDriverOtp(email, otp);
   }
 }
