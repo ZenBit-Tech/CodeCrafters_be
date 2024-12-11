@@ -49,6 +49,22 @@ export class RouteService {
     }
   }
 
+  async getOneForDriver(id: number): Promise<RouteInform> {
+    try {
+      const route = await this.routeRepo.findOneOrFail({
+        where: { user_id: { id } },
+        relations: ['orders'],
+      });
+
+      return transformRouteObject(route);
+    } catch (error: unknown) {
+      if (error instanceof EntityNotFoundError) {
+        throw new BadRequestException(error.message);
+      }
+      throw new InternalServerErrorException("Can't get route details for driver");
+    }
+  }
+
   async getRouteFilters(startDate: Date, endDate: Date) {
     const filters = await this.routeRepo
       .createQueryBuilder('route')
