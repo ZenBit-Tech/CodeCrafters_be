@@ -7,8 +7,11 @@ export class CreateDriverDto {
   @Expose()
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'https://logo-path', description: 'driver logo' })
-  logo: string;
+  @ApiProperty({
+    example: '+380931234567',
+    description: 'driver phone number',
+  })
+  phone_number: string;
 
   @Expose()
   @IsString()
@@ -21,11 +24,6 @@ export class CreateDriverDto {
   @IsEmail()
   @ApiProperty({ example: 'example@gmail.com', description: 'driver email' })
   email: string;
-
-  @Expose()
-  @IsString()
-  @ApiProperty({ example: '+380987654321', description: 'driver phone number in international format' })
-  phone_number: string;
 
   @Expose()
   @IsString()

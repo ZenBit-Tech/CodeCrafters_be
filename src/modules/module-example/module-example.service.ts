@@ -64,7 +64,7 @@ export class ModuleExampleService {
       const company = await this.companyRepo.findOneOrFail({ where: { id } });
 
       company.name = updateModuleExampleDto.name;
-      company.logo = updateModuleExampleDto.logo;
+
       company.email = updateModuleExampleDto.email;
 
       await this.entityManager.save(company);
