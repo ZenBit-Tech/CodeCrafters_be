@@ -5,11 +5,14 @@ import axios from 'axios';
 import { ROUTE_START_POINT } from 'common/constants/strings';
 import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
+import { User } from 'common/database/entities/user.entity';
 import { SortOrder } from 'common/enums/enums';
+import { createRouteNotificationMail } from 'common/helpers/createEmailTemplates';
+import { MailerService } from 'common/mailer/mailer.service';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { transformRouteObject } from 'common/utils/transformRouteObject';
-import { DeleteResult, EntityManager, EntityNotFoundError, Repository } from 'typeorm';
+import { DeleteResult, EntityManager, EntityNotFoundError, In, Repository } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
@@ -22,8 +25,11 @@ export class RouteService {
     private readonly routeRepo: Repository<Route>,
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
     private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
+    private readonly smtpService: MailerService,
   ) {}
 
   async create(createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
@@ -34,6 +40,28 @@ export class RouteService {
         await this.routeRepo.save(route);
       }
       await this.entityManager.save(routes);
+
+      const driverIds = [...new Set(routes.map((route) => route.user_id))].filter(Boolean);
+
+      const users = await this.userRepo.find({
+        where: { id: In(driverIds) },
+      });
+
+      for (const user of users) {
+        await this.smtpService.sendEmail({
+          from: {
+            name: this.configService.getOrThrow('APP_NAME'),
+            address: this.configService.getOrThrow('DEFAULT_EMAIL_FROM'),
+          },
+          recipients: [{ name: user.full_name, address: user.email }],
+          subject: 'New Route Notification',
+          html: createRouteNotificationMail({
+            username: user.full_name,
+          }),
+          placeholderReplacements: {},
+        });
+      }
+
       return { status: 201, message: 'Routes have been successfully created!' };
     } catch (error) {
       throw new InternalServerErrorException(error);

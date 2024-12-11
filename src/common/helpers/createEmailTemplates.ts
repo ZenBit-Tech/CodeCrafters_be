@@ -37,3 +37,14 @@ export const createCompanyInvitationMail = (companyName: string) => {
   
   Best regards, Smartporters team`;
 };
+
+export const createRouteNotificationMail = ({ username }: { username: string }) => {
+  return `Dear ${username},<br><br>
+
+  You have received a new route!<br>
+  Start the route below:<br><br>
+
+  <strong>Open in Google Maps</strong><br><br>
+
+  Have a safe and comfortable journey! Drive carefully!<br><br>`;
+};
