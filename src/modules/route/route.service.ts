@@ -273,11 +273,10 @@ export class RouteService {
 
   async getRoutesForRender(from: Date, to: Date): Promise<RouteInform[]> {
     try {
-      const startDate = new Date(new Date(from).setHours(0, 0, 0, 0));
-      const endDate = new Date(to);
+      const startDate = new Date(from.setHours(0, 0, 0, 0));
       const routes = await this.routeRepo.find({
         where: {
-          arrival_date: Between(startDate, endDate),
+          arrival_date: Between(startDate, to),
         },
         relations: ['orders'],
       });
