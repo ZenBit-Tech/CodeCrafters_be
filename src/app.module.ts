@@ -20,6 +20,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { RouteModule } from './modules/route/route.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { UserModule } from './modules/user/user.module';
+import { CustomersModule } from './modules/customers/customers.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { UserModule } from './modules/user/user.module';
     RouteModule,
     NotificationsModule,
     TicketsModule,
+    CustomersModule,
   ],
   controllers: [],
   providers: [],
