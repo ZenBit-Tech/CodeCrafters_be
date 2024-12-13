@@ -1,4 +1,4 @@
-import { Controller, Get, Query, SetMetadata, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
@@ -9,6 +9,7 @@ import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { FailedResponse } from 'common/types/failed-response.dto';
 import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
 import { stringToBoolean } from 'common/utils/stringToBoolean';
+import { TransformedOrder } from 'common/utils/transformOrderObject';
 
 import { OrdersResponse } from './dto/response.dto';
 import { OrdersService } from './orders.service';
@@ -40,6 +41,13 @@ export class OrdersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async findAll(@Query() queryParams: OrderQueryParams): Promise<{ orders: Order[]; page: number; pagesCount: number }> {
     return this.ordersService.findAll({ ...queryParams, isNew: stringToBoolean(queryParams.isNew) });
+  }
+
+  @Get('boarding-pass/:id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  async getOrder(@Param('id', ParseIntPipe) id: number): Promise<TransformedOrder> {
+    return this.ordersService.getOneForBoardingPass(id);
   }
 
   @Get('by-dates')
