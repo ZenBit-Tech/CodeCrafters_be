@@ -8,6 +8,7 @@ export interface TransformedOrder {
   airport_name: string;
   flight_id: string;
   ticket_photo: string;
+  full_name: string;
 }
 
 export const tranformOrderObject = (order: Order): TransformedOrder => {
@@ -19,5 +20,6 @@ export const tranformOrderObject = (order: Order): TransformedOrder => {
     airport_name: order.airport_name,
     flight_id: order.flight_id,
     ticket_photo: order.ticket_photo,
+    full_name: order.customer.full_name,
   };
 };

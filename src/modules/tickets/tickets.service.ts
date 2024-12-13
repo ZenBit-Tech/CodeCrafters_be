@@ -5,7 +5,7 @@ import { join } from 'path';
 @Injectable()
 export class TicketsService {
   findOne(path: string) {
-    const file = createReadStream(join(process.cwd(), `files/tickets/${path}`));
+    const file = createReadStream(join(process.cwd(), `/${path}`));
     return new StreamableFile(file);
   }
 }
