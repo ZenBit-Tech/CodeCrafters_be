@@ -18,6 +18,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ModuleExampleModule } from './modules/module-example/module-example.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { RouteModule } from './modules/route/route.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -33,6 +34,7 @@ import { UserModule } from './modules/user/user.module';
     OrdersModule,
     RouteModule,
     NotificationsModule,
+    TicketsModule,
   ],
   controllers: [],
   providers: [],
