@@ -15,8 +15,10 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Route } from 'common/database/entities/route.entity';
+import { parseDate } from 'common/decorators/parseDate';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
+import { UserCompanyGuard } from 'common/guards/userCompany.guard';
 import { FailedResponse } from 'common/types/failed-response.dto';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
@@ -85,6 +87,16 @@ export class RouteController {
     }
 
     return this.routeService.getRoutesByDateRange(start, end, sortField, sortDirection, searchQuery, drivers, stopsCount, statuses);
+  }
+
+  @Get('by-date-range')
+  @UseGuards(RolesGuard, UserCompanyGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Route route details' })
+  @ApiResponse({ status: 200, example: { status: 200, type: [Route] } })
+  @ApiResponse({ status: 400, type: FailedResponse })
+  async getRoutesForRender(@parseDate() { from, to }: { from: Date; to: Date }): Promise<RouteInform[]> {
+    return this.routeService.getRoutesForRender(from, to);
   }
 
   @Get(':id')
