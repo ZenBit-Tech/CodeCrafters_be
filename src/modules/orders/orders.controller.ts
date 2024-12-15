@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Query, SetMetadata, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
 import { ParseAssignOrdersJson } from 'common/decorators/parseJsonDecorator';
@@ -46,6 +46,13 @@ export class OrdersController {
   @Get('boarding-pass/:id')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Retrieve an order for a boarding pass' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'The ID of the order to retrieve for the boarding pass',
+    example: 123,
+  })
   async getOrder(@Param('id', ParseIntPipe) id: number): Promise<TransformedOrder> {
     return this.ordersService.getOneForBoardingPass(id);
   }
