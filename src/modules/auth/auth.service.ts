@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
-import { createUserInvitationMail, createDriverInvitationMail } from 'common/helpers/createEmailTemplates';
 import { MailerService } from 'common/mailer/mailer.service';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import * as crypto from 'crypto';
@@ -32,23 +31,26 @@ export class AuthService {
         { expiresIn: '24h' },
       );
 
-      const userCompany: string = user.role === Roles.SUPERADMIN ? '' : user.company_id.name;
+      const companyName: string = user.role === Roles.SUPERADMIN ? '' : user.company_id.name;
 
-      await this.smtpService.sendEmail({
+      await this.smtpService.sendDynamicEmail({
         from: { name: this.configService.getOrThrow('APP_NAME'), address: this.configService.getOrThrow('DEFAULT_EMAIL_FROM') },
-        recipients: [{ name: user.full_name, address: user.email }],
-        subject: 'Invitation Link',
-        html: createUserInvitationMail({
-          companyName: userCompany,
-          username: user.full_name,
-          token,
-        }),
-        placeholderReplacements: {},
+        recipients: user.email,
+        subject: 'Welcome to Codecrafters',
+        content: {
+          fullName: user.company_id.name,
+          companyName,
+          additionalInfo: 'Click the link below to complete your registration.',
+        },
+        footerEmail: user.email,
+        isAdmin: user.role !== Roles.DRIVER,
+        isSuperAdmin: user.role === Roles.SUPERADMIN,
+        token,
       });
 
-      return { status: 200, message: 'You logged in successfully check your email' };
+      return { status: 200, message: 'You logged in successfully. Check your email.' };
     } catch (error) {
-      throw new BadRequestException("User with this email isn't exists");
+      throw new BadRequestException("User with this email doesn't exist.");
     }
   }
 
@@ -81,7 +83,7 @@ export class AuthService {
         throw new BadRequestException("User with this email isn't a driver");
       }
 
-      const userCompany: string = user.company_id.name;
+      const companyName: string = user.company_id.name;
 
       const otp: string = this.generateOtp();
       const otpExpiry = new Date();
@@ -93,19 +95,20 @@ export class AuthService {
 
       await this.userRepo.save(user);
 
-      await this.smtpService.sendEmail({
+      await this.smtpService.sendDynamicEmail({
         from: { name: this.configService.getOrThrow('APP_NAME'), address: this.configService.getOrThrow('DEFAULT_EMAIL_FROM') },
-        recipients: [{ name: user.full_name, address: user.email }],
-        subject: 'Invitation Link',
-        html: createDriverInvitationMail({
-          companyName: userCompany,
-          username: user.full_name,
-          otp,
-        }),
-        placeholderReplacements: {},
+        recipients: user.email,
+        subject: 'Welcome to Codecrafters',
+        content: {
+          fullName: user.full_name,
+          companyName,
+          additionalInfo: 'Log in by entering the verification code:',
+        },
+        footerEmail: user.email,
+        otp,
       });
 
-      return { status: 200, message: 'You logged in successfully check your email' };
+      return { status: 200, message: 'You logged in successfully. Check your email.' };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
