@@ -29,3 +29,18 @@ export interface OrderWithRouteAndCustomer {
   customerName: string;
   customerPhone: string | null;
 }
+
+export interface EmailContent {
+  fullName?: string;
+  companyName?: string;
+  additionalInfo?: string;
+}
+
+export interface EmailTemplateProps {
+  content: EmailContent;
+  footerEmail: string;
+  isAdmin?: boolean;
+  isSuperAdmin?: boolean;
+  otp?: string;
+  token?: string;
+}
