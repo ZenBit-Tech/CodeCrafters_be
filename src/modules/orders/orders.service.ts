@@ -7,6 +7,7 @@ import { User } from 'common/database/entities/user.entity';
 import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
 import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
+import { tranformOrderObject, TransformedOrder } from 'common/utils/transformOrderObject';
 import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
 
 import { OrderServiceParams } from './types';
@@ -133,6 +134,16 @@ export class OrdersService {
       return { orders, page: +page, pagesCount: Math.ceil(ordersCount / 10) };
     } catch (error) {
       throw new InternalServerErrorException('Internal server error');
+    }
+  }
+
+  async getOneForBoardingPass(id: number): Promise<TransformedOrder> {
+    try {
+      const order = await this.orderRepository.findOneOrFail({ where: { id } });
+
+      return tranformOrderObject(order);
+    } catch (error) {
+      throw new NotFoundException("Can't find order");
     }
   }
 
