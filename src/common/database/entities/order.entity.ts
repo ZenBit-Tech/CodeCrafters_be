@@ -26,6 +26,15 @@ export class Order {
   @Column({ nullable: false })
   status: OrderStatuses;
 
+  @Column({ nullable: false, default: 'John F. Kennedy International Airport' })
+  airport_name: string;
+
+  @Column({ nullable: false, default: 'Yss234jJi' })
+  flight_id: string;
+
+  @Column({ nullable: false, default: 'files/tickets/image 30.png' })
+  ticket_photo: string;
+
   @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true, nullable: false })
   @JoinColumn()
   customer: Customer;

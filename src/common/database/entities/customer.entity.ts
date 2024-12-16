@@ -14,6 +14,9 @@ export class Customer {
   @Column({ nullable: false, unique: true })
   email: string;
 
+  @Column({ nullable: false, default: false })
+  is_passport_upploaded: boolean;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
