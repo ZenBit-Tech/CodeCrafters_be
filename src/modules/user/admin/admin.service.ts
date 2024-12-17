@@ -11,7 +11,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { User } from 'common/database/entities/user.entity';
 import { Roles } from 'common/enums/enums';
-import { createUserInvitationMail } from 'common/helpers/createEmailTemplates';
 import { MailerService } from 'common/mailer/mailer.service';
 import { ResponseInterface } from 'common/types/interfaces';
 import * as jwt from 'jsonwebtoken';
@@ -51,12 +50,18 @@ export class AdminService {
 
       const invitationToken: string = jwt.sign({ ...admin }, this.configService.getOrThrow('JWT_SECRET'));
 
-      await this.smtpService.sendEmail({
+      await this.smtpService.sendDynamicEmail({
         from: { name: this.configService.getOrThrow('APP_NAME'), address: this.configService.getOrThrow('DEFAULT_EMAIL_FROM') },
-        recipients: [{ name: createAdminData.full_name, address: createAdminData.email }],
-        subject: 'Invitation Link',
-        html: createUserInvitationMail({ companyName: company.name, username: createAdminData.full_name, token: invitationToken }),
-        placeholderReplacements: {},
+        recipients: createAdminData.email,
+        subject: 'Welcome to Codecrafters',
+        content: {
+          fullName: createAdminData.full_name,
+          companyName: company.name,
+          additionalInfo: 'Click the link below to complete your registration.',
+        },
+        footerEmail: createAdminData.email,
+        isAdmin: createAdminData.role !== Roles.DRIVER,
+        token: invitationToken,
       });
 
       return { status: 201, message: 'User created successfully' };
