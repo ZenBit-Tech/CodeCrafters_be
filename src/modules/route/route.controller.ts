@@ -60,7 +60,7 @@ export class RouteController {
   }
 
   @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER, Roles.DRIVER])
   @Get('by-dates')
   @ApiResponse({ status: 200, description: 'Routes found', type: [Route] })
   @ApiResponse({ status: 404, description: 'No routes found' })
