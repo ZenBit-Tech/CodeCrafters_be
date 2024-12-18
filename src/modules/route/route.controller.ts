@@ -20,10 +20,12 @@ import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
 import { UserCompanyGuard } from 'common/guards/userCompany.guard';
 import { FailedResponse } from 'common/types/failed-response.dto';
+import { NotFoundResponse } from 'common/types/not-found-response';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 
 import { CreateRouteDto } from './dto/create-route.dto';
+import { UpdateRouteStatusDto } from './dto/update-route-status.dto';
 import { RouteService } from './route.service';
 import { RouteData } from './types';
 
@@ -115,8 +117,8 @@ export class RouteController {
   @ApiOperation({ summary: 'Route details for driver' })
   @ApiResponse({ status: 200, example: { status: 200, type: Route } })
   @ApiResponse({ status: 400, type: FailedResponse })
-  async getRouteDetailsForDriver(@Param('id') userId: number): Promise<RouteInform> {
-    return this.routeService.getOneForDriver(+userId);
+  async getRouteDetailsForDriver(@Param('id', ParseIntPipe) userId: number): Promise<RouteInform> {
+    return this.routeService.getOneForDriver(userId);
   }
 
   @Patch(':id')
@@ -127,6 +129,17 @@ export class RouteController {
   @ApiResponse({ status: 400, type: FailedResponse })
   async updateRoute(@Param('id', ParseIntPipe) id: number, @Query('orderId', ParseIntPipe) orderId: number): Promise<RouteInform> {
     return this.routeService.removeOrderFromRoute(id, orderId);
+  }
+
+  @Patch('driver/:id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER, Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Update route status' })
+  @ApiResponse({ status: 200, example: { status: 200, type: Route } })
+  @ApiResponse({ status: 400, type: FailedResponse })
+  @ApiResponse({ status: 404, type: NotFoundResponse })
+  async updateRouteStatus(@Param('id', ParseIntPipe) id: number, @Body() updateRouteStatusDto: UpdateRouteStatusDto): Promise<RouteInform> {
+    return this.routeService.updateRouteStatus(id, updateRouteStatusDto);
   }
 
   @Delete(':id')
