@@ -271,7 +271,7 @@ export class RouteService {
 
       return await this.getOne(routeId);
     } catch (error) {
-      throw new NotFoundException('There is no such order');
+      throw new NotFoundException('There is no such route');
     }
   }
 
