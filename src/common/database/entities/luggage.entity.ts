@@ -15,6 +15,9 @@ export class Luggage {
   @Column({ nullable: false })
   luggage_weight: number;
 
+  @Column({ nullable: false })
+  luggage_description: string;
+
   @OneToMany(() => LuggageImages, (luggageImg) => luggageImg.luggage, { cascade: true, eager: true })
   imgs: LuggageImages[];
 
