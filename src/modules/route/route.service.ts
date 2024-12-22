@@ -16,6 +16,7 @@ import { DeleteResult, EntityManager, EntityNotFoundError, In, Repository, Betwe
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
+import { UpdateRouteStatusDto } from './dto/update-route-status.dto';
 import { FilterData, RouteData } from './types';
 
 @Injectable()
@@ -86,17 +87,23 @@ export class RouteService {
 
   async getOneForDriver(id: number): Promise<RouteInform> {
     try {
-      const route = await this.routeRepo.findOneOrFail({
+      const route = await this.routeRepo.findOne({
         where: { user_id: { id } },
         relations: ['orders'],
       });
 
+      if (!route) {
+        throw new NotFoundException('There is no such route');
+      }
       return transformRouteObject(route);
     } catch (error: unknown) {
       if (error instanceof EntityNotFoundError) {
         throw new BadRequestException(error.message);
       }
-      throw new InternalServerErrorException("Can't get route details for driver");
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException('Something went wrong');
     }
   }
 
@@ -252,6 +259,19 @@ export class RouteService {
       return await this.getOne(routeId);
     } catch (error) {
       throw new NotFoundException('There is no such order');
+    }
+  }
+
+  async updateRouteStatus(routeId: number, updateRouteStatusDto: UpdateRouteStatusDto): Promise<RouteInform> {
+    try {
+      const route = await this.routeRepo.findOneOrFail({ where: { id: routeId, user_id: { id: updateRouteStatusDto.driverId } } });
+
+      route.status = updateRouteStatusDto.status;
+      await this.entityManager.save(route);
+
+      return await this.getOne(routeId);
+    } catch (error) {
+      throw new NotFoundException('There is no such route');
     }
   }
 
