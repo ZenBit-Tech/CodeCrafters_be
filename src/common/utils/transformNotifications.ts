@@ -1,3 +1,4 @@
+import { HOURS_IN_DAY, HOURS_IN_MONTH, HOURS_IN_TWO_DAYS, HOURS_IN_YEAR } from 'common/constants/numbers';
 import { Notification } from 'common/database/entities/notification.entity';
 import { NotificationTypes } from 'common/enums/enums';
 
@@ -41,16 +42,16 @@ export const transformNotifications = (notifications: Notification[]): GetNotifi
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .forEach((notification) => {
       const diffTime = Math.floor(Math.abs(now.getTime() - new Date(notification.createdAt).getTime()) / 3600000);
-      if (diffTime < 24) {
+      if (diffTime < HOURS_IN_DAY) {
         getNotificationsResponse.today.push(transformNotification(notification, `${diffTime}h`));
       }
-      if (diffTime >= 24 && diffTime < 48) {
+      if (diffTime >= HOURS_IN_DAY && diffTime < HOURS_IN_TWO_DAYS) {
         getNotificationsResponse.yesterday.push(transformNotification(notification, 'yesterday'));
       }
-      if (diffTime >= 48 && diffTime < 720) {
-        getNotificationsResponse.thisMonth.push(transformNotification(notification, 'this moth'));
+      if (diffTime >= HOURS_IN_TWO_DAYS && diffTime < HOURS_IN_MONTH) {
+        getNotificationsResponse.thisMonth.push(transformNotification(notification, 'this month'));
       }
-      if (diffTime >= 720 && diffTime < 8640) {
+      if (diffTime >= HOURS_IN_MONTH && diffTime < HOURS_IN_YEAR) {
         getNotificationsResponse.thisYear.push(transformNotification(notification, 'this year'));
       }
     });
