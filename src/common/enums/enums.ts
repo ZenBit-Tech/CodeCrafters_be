@@ -5,7 +5,9 @@ export enum LuggageTypes {
 }
 export enum NotificationTypes {
   ROUTE = 'route',
-  NOTE = 'note',
+  BELL = 'bell',
+  LUGGAGE = 'luggage',
+  MAP_PIN = 'map-pin',
   START_ROUTE = 'start-route',
   ORDER_FAILURE_REASON = 'order-failure-reason',
 }
