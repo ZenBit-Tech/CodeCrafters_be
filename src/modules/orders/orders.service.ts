@@ -293,4 +293,23 @@ export class OrdersService {
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
+
+  async setFailedReason(orderId: number, reason: string): Promise<Order> {
+    try {
+      const order = await this.orderRepository.findOne({ where: { id: orderId } });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      order.failed_reason = reason;
+
+      return await this.orderRepository.save(order);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Something went wrong while updating the order.');
+    }
+  }
 }
