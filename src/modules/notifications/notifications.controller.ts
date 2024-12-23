@@ -65,6 +65,15 @@ export class NotificationsController {
     return this.notificationsService.getNotifications(userId);
   }
 
+  @Get('/unread-count/:userId')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Get unread notifications' })
+  @ApiResponse({ status: 200, description: 'Unread notifications count response success', example: { count: 8 } })
+  async getAllUnread(@Param('userId', ParseIntPipe) userId: number): Promise<{ count: number }> {
+    return this.notificationsService.getUnreadNotificationsCount(userId);
+  }
+
   @Patch(':userId')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])

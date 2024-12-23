@@ -46,6 +46,16 @@ export class NotificationsService {
     }
   }
 
+  async getUnreadNotificationsCount(userId: number): Promise<{ count: number }> {
+    try {
+      const count = await this.notificationsRepo.count({ where: { user_id: { id: userId }, is_readed: false } });
+
+      return { count };
+    } catch (error) {
+      throw new NotFoundException('There is no such user');
+    }
+  }
+
   async readAllNotifications(userId: number): Promise<boolean> {
     try {
       const notifications = await this.notificationsRepo.find({ where: { user_id: { id: userId }, is_readed: false } });
