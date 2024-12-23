@@ -25,6 +25,42 @@ export class NotificationsController {
   @Get(':userId')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Get all notifications by driver id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Get notifications successfully',
+    example: {
+      today: [
+        {
+          id: 3,
+          type: 'route',
+          linkText: '9',
+          linkHref: '9',
+          message: 'You have received new route #000125',
+          timeDifference: '2h',
+        },
+        {
+          id: 1,
+          type: 'bell',
+          linkText: '9',
+          linkHref: '9',
+          message: 'You have received new route #000125',
+          timeDifference: '2h',
+        },
+        {
+          id: 2,
+          type: 'luggage',
+          linkText: '9',
+          linkHref: '9',
+          message: 'You have received new route #000125',
+          timeDifference: '2h',
+        },
+      ],
+      yesterday: [],
+      thisMonth: [],
+      thisYear: [],
+    },
+  })
   async getAll(@Param('userId', ParseIntPipe) userId: number): Promise<GetNotificationsResponse> {
     return this.notificationsService.getNotifications(userId);
   }

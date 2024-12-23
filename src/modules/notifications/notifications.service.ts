@@ -40,7 +40,7 @@ export class NotificationsService {
 
       return transformNotifications(notifications);
     } catch (error) {
-      throw new NotFoundException('Cant find smthng');
+      throw new NotFoundException('Cant get notifications');
     }
   }
 }
