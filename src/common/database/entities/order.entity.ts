@@ -35,6 +35,9 @@ export class Order {
   @Column({ nullable: false, default: 'files/tickets/image 30.png' })
   ticket_photo: string;
 
+  @Column({ type: 'text', nullable: true })
+  failed_reason: string | null;
+
   @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true, nullable: false })
   @JoinColumn()
   customer: Customer;
