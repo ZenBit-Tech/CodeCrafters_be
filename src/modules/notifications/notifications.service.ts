@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'common/database/entities/notification.entity';
 import { User } from 'common/database/entities/user.entity';
+import { GetNotificationsResponse, transformNotifications } from 'common/utils/transformNotifications';
 import { Repository } from 'typeorm';
 
 import { CreateNotificationDto } from './dto/notification.dto';
@@ -33,9 +34,11 @@ export class NotificationsService {
     return this.notificationsRepo.save(notification);
   }
 
-  async getNotifications(userId: number) {
+  async getNotifications(userId: number): Promise<GetNotificationsResponse> {
     try {
-      return await this.notificationsRepo.find({ where: { user_id: { id: userId } } });
+      const notifications = await this.notificationsRepo.find({ where: { user_id: { id: userId } } });
+
+      return transformNotifications(notifications);
     } catch (error) {
       throw new NotFoundException('Cant find smthng');
     }

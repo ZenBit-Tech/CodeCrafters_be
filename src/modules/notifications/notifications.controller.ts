@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Notification } from 'common/database/entities/notification.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
+import { GetNotificationsResponse } from 'common/utils/transformNotifications';
 
 import { CreateNotificationDto } from './dto/notification.dto';
 import { NotificationsService } from './notifications.service';
@@ -24,7 +25,7 @@ export class NotificationsController {
   @Get(':userId')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])
-  async getAll(@Param('userId', ParseIntPipe) userId: number): Promise<Notification[]> {
+  async getAll(@Param('userId', ParseIntPipe) userId: number): Promise<GetNotificationsResponse> {
     return this.notificationsService.getNotifications(userId);
   }
 }
