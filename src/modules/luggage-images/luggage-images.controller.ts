@@ -14,7 +14,7 @@ import { LuggageImagesService } from './luggage-images.service';
 export class LuggageImagesController {
   constructor(private readonly luggageImagesService: LuggageImagesService) {}
 
-  @Get('luggage/:orderId')
+  @Get('luggage/get-by-order/:orderId')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])
   @ApiOperation({ summary: 'Get luggage by order ID' })
@@ -76,7 +76,7 @@ export class LuggageImagesController {
     return this.luggageImagesService.uploadImage(file, uploadImageDto.luggageId);
   }
 
-  @Delete('luggage/:luggageId/images')
+  @Delete(':luggageId')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])
   @ApiOperation({ summary: 'Delete all images for a specific luggage' })
