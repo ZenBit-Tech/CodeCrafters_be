@@ -111,15 +111,15 @@ export class RouteController {
     return this.routeService.getOne(+id);
   }
 
-  @Get('driver/:driverId/:routeId')
+  @Get('driver/:routeId')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])
   @ApiOperation({ summary: 'Route details for driver and specific route' })
   @ApiResponse({ status: 200, example: { status: 200, type: Route } })
   @ApiResponse({ status: 400, type: FailedResponse })
   async getRouteDetailsForDriver(
-    @Param('driverId', ParseIntPipe) driverId: number,
     @Param('routeId', ParseIntPipe) routeId: number,
+    @Query('driverId', ParseIntPipe) driverId: number,
   ): Promise<RouteInform> {
     return this.routeService.getOneForDriver(driverId, routeId);
   }
