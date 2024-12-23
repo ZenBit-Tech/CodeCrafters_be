@@ -8,7 +8,7 @@ import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
 import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
 import { tranformOrderObject, TransformedOrder } from 'common/utils/transformOrderObject';
-import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
+import { FindManyOptions, IsNull, Like, Between, Not, Repository, EntityNotFoundError } from 'typeorm';
 
 import { OrderServiceParams } from './types';
 
@@ -296,18 +296,14 @@ export class OrdersService {
 
   async setFailedReason(orderId: number, reason: string): Promise<Order> {
     try {
-      const order = await this.orderRepository.findOne({ where: { id: orderId } });
-
-      if (!order) {
-        throw new NotFoundException('Order not found');
-      }
+      const order = await this.orderRepository.findOneOrFail({ where: { id: orderId } });
 
       order.failed_reason = reason;
 
       return await this.orderRepository.save(order);
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException('Order not found');
       }
       throw new InternalServerErrorException('Something went wrong while updating the order.');
     }
