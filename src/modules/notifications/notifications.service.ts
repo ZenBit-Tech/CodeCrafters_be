@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'common/database/entities/notification.entity';
 import { User } from 'common/database/entities/user.entity';
 import { GetNotificationsResponse, transformNotifications } from 'common/utils/transformNotifications';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 import { CreateNotificationDto } from './dto/notification.dto';
 
@@ -15,6 +15,8 @@ export class NotificationsService {
 
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+
+    private readonly entityManager: EntityManager,
   ) {}
 
   async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
@@ -41,6 +43,22 @@ export class NotificationsService {
       return transformNotifications(notifications);
     } catch (error) {
       throw new NotFoundException('Cant get notifications');
+    }
+  }
+
+  async readAllNotifications(userId: number): Promise<boolean> {
+    try {
+      const notifications = await this.notificationsRepo.find({ where: { user_id: { id: userId }, is_readed: false } });
+
+      const readNotifications = notifications.map((notification) => {
+        notification.is_readed = true;
+        return notification;
+      });
+
+      await this.entityManager.save(readNotifications);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, SetMetadata, Get, ParseIntPipe, Param } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, SetMetadata, Get, ParseIntPipe, Param, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Notification } from 'common/database/entities/notification.entity';
 import { Roles } from 'common/enums/enums';
@@ -63,5 +63,14 @@ export class NotificationsController {
   })
   async getAll(@Param('userId', ParseIntPipe) userId: number): Promise<GetNotificationsResponse> {
     return this.notificationsService.getNotifications(userId);
+  }
+
+  @Patch(':userId')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Update is read status for each notification in specific driver' })
+  @ApiResponse({ status: 200, description: 'Notification read', type: Boolean })
+  async updateAll(@Param('userId', ParseIntPipe) userId: number): Promise<boolean> {
+    return this.notificationsService.readAllNotifications(userId);
   }
 }
