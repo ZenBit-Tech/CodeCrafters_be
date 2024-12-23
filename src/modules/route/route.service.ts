@@ -85,16 +85,20 @@ export class RouteService {
     }
   }
 
-  async getOneForDriver(id: number): Promise<RouteInform> {
+  async getOneForDriver(driverId: number, routeId: number): Promise<RouteInform> {
     try {
       const route = await this.routeRepo.findOne({
-        where: { user_id: { id } },
+        where: {
+          user_id: { id: driverId },
+          id: routeId,
+        },
         relations: ['orders'],
       });
 
       if (!route) {
         throw new NotFoundException('There is no such route');
       }
+
       return transformRouteObject(route);
     } catch (error: unknown) {
       if (error instanceof EntityNotFoundError) {
