@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, SetMetadata, Get, ParseIntPipe, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Notification } from 'common/database/entities/notification.entity';
 import { Roles } from 'common/enums/enums';
@@ -19,5 +19,12 @@ export class NotificationsController {
   @ApiResponse({ status: 201, description: 'Notification created', type: Notification })
   async create(@Body() createNotificationDto: CreateNotificationDto): Promise<Notification> {
     return this.notificationsService.create(createNotificationDto);
+  }
+
+  @Get(':userId')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  async getAll(@Param('userId', ParseIntPipe) userId: number): Promise<Notification[]> {
+    return this.notificationsService.getNotifications(userId);
   }
 }

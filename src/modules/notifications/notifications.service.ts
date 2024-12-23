@@ -19,6 +19,7 @@ export class NotificationsService {
   async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
     const { userId, ...notificationData } = createNotificationDto;
 
+    // todo try catch statement
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
@@ -30,5 +31,13 @@ export class NotificationsService {
     });
 
     return this.notificationsRepo.save(notification);
+  }
+
+  async getNotifications(userId: number) {
+    try {
+      return await this.notificationsRepo.find({ where: { user_id: { id: userId } } });
+    } catch (error) {
+      throw new NotFoundException('Cant find smthng');
+    }
   }
 }
