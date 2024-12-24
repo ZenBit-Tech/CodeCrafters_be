@@ -193,27 +193,37 @@ export class OrdersService {
     }));
 
     const notAssignedOrders: Order[] = [];
-    const driverCount = drivers.length;
-    for (const order of orders) {
+
+    let orderIndex = 0;
+    for (const assignment of assignments) {
+      if (orderIndex < orders.length) {
+        assignment.orders.push(orders[orderIndex]);
+        orderIndex += 1;
+      }
+    }
+
+    while (orderIndex < orders.length) {
       let assigned = false;
 
-      for (let i = 0; i < driverCount; i += 1) {
-        const assignment = assignments[i];
+      for (const assignment of assignments) {
         const driverOrders = assignment.orders;
+        const currentOrder = orders[orderIndex];
 
         const hasSameStartTime = driverOrders.some(
-          (o) => new Date(o.collection_time_start).getTime() === new Date(order.collection_time_start).getTime(),
+          (o) => new Date(o.collection_time_start).getTime() === new Date(currentOrder.collection_time_start).getTime(),
         );
 
         if (!hasSameStartTime) {
-          assignment.orders.push(order);
+          assignment.orders.push(currentOrder);
           assigned = true;
+          orderIndex += 1;
           break;
         }
       }
 
       if (!assigned) {
-        notAssignedOrders.push(order);
+        notAssignedOrders.push(orders[orderIndex]);
+        orderIndex += 1;
       }
     }
 

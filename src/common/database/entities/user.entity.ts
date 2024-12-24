@@ -10,7 +10,7 @@ export class User {
   @ApiProperty({ example: 1, description: 'user id' })
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: '' })
   @ApiProperty({ example: 'John Doe', description: 'user full name' })
   full_name: string;
 
