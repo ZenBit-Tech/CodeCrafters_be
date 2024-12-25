@@ -38,23 +38,21 @@ export const transformNotifications = (notifications: Notification[]): GetNotifi
   };
   const now = new Date();
 
-  notifications
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .forEach((notification) => {
-      const diffTime = Math.floor(Math.abs(now.getTime() - new Date(notification.createdAt).getTime()) / MILLISECONDS_IN_HOUR);
-      if (diffTime < HOURS_IN_DAY) {
-        getNotificationsResponse.today.push(transformNotification(notification, `${diffTime}h`));
-      }
-      if (diffTime >= HOURS_IN_DAY && diffTime < HOURS_IN_TWO_DAYS) {
-        getNotificationsResponse.yesterday.push(transformNotification(notification, 'yesterday'));
-      }
-      if (diffTime >= HOURS_IN_TWO_DAYS && diffTime < HOURS_IN_MONTH) {
-        getNotificationsResponse.thisMonth.push(transformNotification(notification, 'this month'));
-      }
-      if (diffTime >= HOURS_IN_MONTH && diffTime < HOURS_IN_YEAR) {
-        getNotificationsResponse.thisYear.push(transformNotification(notification, 'this year'));
-      }
-    });
+  notifications.forEach((notification) => {
+    const diffTime = Math.floor(Math.abs(now.getTime() - new Date(notification.createdAt).getTime()) / MILLISECONDS_IN_HOUR);
+    if (diffTime < HOURS_IN_DAY) {
+      getNotificationsResponse.today.push(transformNotification(notification, `${diffTime}h`));
+    }
+    if (diffTime >= HOURS_IN_DAY && diffTime < HOURS_IN_TWO_DAYS) {
+      getNotificationsResponse.yesterday.push(transformNotification(notification, 'yesterday'));
+    }
+    if (diffTime >= HOURS_IN_TWO_DAYS && diffTime < HOURS_IN_MONTH) {
+      getNotificationsResponse.thisMonth.push(transformNotification(notification, 'this month'));
+    }
+    if (diffTime >= HOURS_IN_MONTH && diffTime < HOURS_IN_YEAR) {
+      getNotificationsResponse.thisYear.push(transformNotification(notification, 'this year'));
+    }
+  });
 
   return getNotificationsResponse;
 };

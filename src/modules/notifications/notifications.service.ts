@@ -38,7 +38,7 @@ export class NotificationsService {
 
   async getNotifications(userId: number): Promise<GetNotificationsResponse> {
     try {
-      const notifications = await this.notificationsRepo.find({ where: { user_id: { id: userId } } });
+      const notifications = await this.notificationsRepo.find({ where: { user_id: { id: userId } }, order: { createdAt: 'DESC' } });
 
       return transformNotifications(notifications);
     } catch (error) {
