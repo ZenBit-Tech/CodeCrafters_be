@@ -43,6 +43,16 @@ export class OrdersController {
     return this.ordersService.findAll({ ...queryParams, isNew: stringToBoolean(queryParams.isNew) });
   }
 
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Get detailed information about specific Order' })
+  @ApiParam({ name: 'id', description: 'Order id', example: 23 })
+  @ApiResponse({ status: 200, description: 'Get order details' })
+  async getOrderData(@Param('id', ParseIntPipe) id: number): Promise<Order> {
+    return this.ordersService.getOne(id);
+  }
+
   @Get('boarding-pass/:id')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])

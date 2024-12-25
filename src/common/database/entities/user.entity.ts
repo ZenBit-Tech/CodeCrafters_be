@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Roles } from 'common/enums/enums';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Company } from './company.entity';
+import { Order } from './order.entity';
 
 @Entity()
 export class User {
@@ -38,6 +39,9 @@ export class User {
   @JoinColumn()
   @ApiProperty({ example: Company, description: 'user company' })
   company_id: Company;
+
+  @OneToMany(() => Order, (order) => order.dispatcher, { cascade: true })
+  orders: Order[];
 
   @CreateDateColumn({ type: 'timestamp' })
   @ApiProperty({ example: new Date(), description: 'user created_at' })

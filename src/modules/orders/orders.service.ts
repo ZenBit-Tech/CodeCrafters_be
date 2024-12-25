@@ -137,9 +137,17 @@ export class OrdersService {
     }
   }
 
+  async getOne(id: number): Promise<Order> {
+    try {
+      return await this.orderRepository.findOneOrFail({ where: { id }, relations: ['dispatcher'] });
+    } catch (error) {
+      throw new NotFoundException('');
+    }
+  }
+
   async getOneForBoardingPass(id: number): Promise<TransformedOrder> {
     try {
-      const order = await this.orderRepository.findOneOrFail({ where: { id } });
+      const order = await this.orderRepository.findOneOrFail({ where: { id }, relations: ['customer'] });
 
       return tranformOrderObject(order);
     } catch (error) {

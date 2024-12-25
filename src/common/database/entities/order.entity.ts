@@ -5,6 +5,7 @@ import { Company } from './company.entity';
 import { Customer } from './customer.entity';
 import { Luggage } from './luggage.entity';
 import { Route } from './route.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Order {
@@ -38,13 +39,11 @@ export class Order {
   @Column({ type: 'text', nullable: true })
   failed_reason: string | null;
 
-  //
-  // @ManyToOne(() => Customer, (customer) => customer.id, { cascade: true, eager: true, nullable: false })
-  // @JoinColumn()
-  // customer: Customer;
-
   @ManyToOne(() => Customer, (customer) => customer.orders)
   customer: Customer;
+
+  @ManyToOne(() => User, (dispatcher) => dispatcher.orders)
+  dispatcher: User;
 
   @ManyToOne(() => Route, (route) => route.orders)
   route: Route | null;
