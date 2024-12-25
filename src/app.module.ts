@@ -25,6 +25,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { RouteModule } from './modules/route/route.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { UserModule } from './modules/user/user.module';
+import { LuggagesModule } from './modules/luggages/luggages.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { UserModule } from './modules/user/user.module';
     TicketsModule,
     CustomersModule,
     LuggageImagesModule,
+    LuggagesModule,
   ],
   controllers: [],
   providers: [],
