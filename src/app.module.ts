@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
 import { Customer } from 'common/database/entities/customer.entity';
@@ -10,7 +12,9 @@ import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
 import { CompanyModule } from 'modules/company/company.module';
+import { LuggageImagesModule } from 'modules/luggage-images/luggage-images.module';
 import { NotificationsModule } from 'modules/notifications/notifications.module';
+import { join } from 'path';
 
 import { DatabaseModule } from './common/database/database.module';
 import { MailerModule } from './common/mailer/mailer.module';
@@ -27,6 +31,13 @@ import { UserModule } from './modules/user/user.module';
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     TypeOrmModule.forFeature([User, Route, Company, Order, Notification, Luggage, LuggageImages, Customer]),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
+    MulterModule.register({
+      dest: './uploads',
+    }),
     ModuleExampleModule,
     MailerModule,
     AuthModule,
@@ -37,6 +48,7 @@ import { UserModule } from './modules/user/user.module';
     NotificationsModule,
     TicketsModule,
     CustomersModule,
+    LuggageImagesModule,
   ],
   controllers: [],
   providers: [],

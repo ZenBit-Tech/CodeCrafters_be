@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Query, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
@@ -128,5 +128,15 @@ export class OrdersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async getNewOrdersCount(@Query('companyId') companyId: number): Promise<number> {
     return this.ordersService.getNewOrdersCount(companyId);
+  }
+
+  @Post('failed-reason')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiResponse({ status: 201, description: 'Failure reason saved successfully' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  async setFailedReason(@Body('orderId') orderId: number, @Body('reason') reason: string): Promise<Order> {
+    return this.ordersService.setFailedReason(orderId, reason);
   }
 }

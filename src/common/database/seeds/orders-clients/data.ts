@@ -31,6 +31,7 @@ export interface OrderInterface {
 export interface LuggageInterface {
   luggage_type: LuggageTypes;
   luggage_weight: number;
+  luggage_description: string;
 }
 
 export interface LuggageImgsInterface {
@@ -51,11 +52,11 @@ export const customersData: CustomerInterface[] = [
 ];
 
 export const luggagesData: LuggageInterface[] = [
-  { luggage_type: LuggageTypes.BIG, luggage_weight: 23 },
-  { luggage_type: LuggageTypes.MIDDLE, luggage_weight: 7 },
-  { luggage_type: LuggageTypes.BIG, luggage_weight: 15 },
-  { luggage_type: LuggageTypes.SMALL, luggage_weight: 5 },
-  { luggage_type: LuggageTypes.SMALL, luggage_weight: 3 },
+  { luggage_type: LuggageTypes.BIG, luggage_weight: 23, luggage_description: 'Yellow bag' },
+  { luggage_type: LuggageTypes.MIDDLE, luggage_weight: 7, luggage_description: 'Black purse' },
+  { luggage_type: LuggageTypes.BIG, luggage_weight: 15, luggage_description: 'Green duffel' },
+  { luggage_type: LuggageTypes.SMALL, luggage_weight: 5, luggage_description: 'Pink case' },
+  { luggage_type: LuggageTypes.SMALL, luggage_weight: 3, luggage_description: 'Grey backpack' },
 ];
 
 export const ordersData: OrderInterface[] = [

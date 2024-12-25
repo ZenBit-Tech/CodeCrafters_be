@@ -1,8 +1,9 @@
-import { Controller, Post, Body, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, SetMetadata, Get, ParseIntPipe, Param, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Notification } from 'common/database/entities/notification.entity';
 import { Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
+import { GetNotificationsResponse } from 'common/utils/transformNotifications';
 
 import { CreateNotificationDto } from './dto/notification.dto';
 import { NotificationsService } from './notifications.service';
@@ -19,5 +20,66 @@ export class NotificationsController {
   @ApiResponse({ status: 201, description: 'Notification created', type: Notification })
   async create(@Body() createNotificationDto: CreateNotificationDto): Promise<Notification> {
     return this.notificationsService.create(createNotificationDto);
+  }
+
+  @Get(':userId')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Get all notifications by driver id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Get notifications successfully',
+    example: {
+      today: [
+        {
+          id: 3,
+          type: 'route',
+          linkText: '9',
+          linkHref: '9',
+          message: 'You have received new route #000125',
+          timeDifference: '2h',
+        },
+        {
+          id: 1,
+          type: 'bell',
+          linkText: '9',
+          linkHref: '9',
+          message: 'You have received new route #000125',
+          timeDifference: '2h',
+        },
+        {
+          id: 2,
+          type: 'luggage',
+          linkText: '9',
+          linkHref: '9',
+          message: 'You have received new route #000125',
+          timeDifference: '2h',
+        },
+      ],
+      yesterday: [],
+      thisMonth: [],
+      thisYear: [],
+    },
+  })
+  async getAll(@Param('userId', ParseIntPipe) userId: number): Promise<GetNotificationsResponse> {
+    return this.notificationsService.getNotifications(userId);
+  }
+
+  @Get('/unread-count/:userId')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Get unread notifications' })
+  @ApiResponse({ status: 200, description: 'Unread notifications count response success', example: { count: 8 } })
+  async getAllUnread(@Param('userId', ParseIntPipe) userId: number): Promise<{ count: number }> {
+    return this.notificationsService.getUnreadNotificationsCount(userId);
+  }
+
+  @Patch(':userId')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Update is read status for each notification in specific driver' })
+  @ApiResponse({ status: 200, description: 'Notification read', type: Boolean })
+  async updateAll(@Param('userId', ParseIntPipe) userId: number): Promise<boolean> {
+    return this.notificationsService.readAllNotifications(userId);
   }
 }

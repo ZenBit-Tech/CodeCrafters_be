@@ -7,12 +7,10 @@ import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
 import { SortOrder } from 'common/enums/enums';
-import { createRouteNotificationMail } from 'common/helpers/createEmailTemplates';
-import { MailerService } from 'common/mailer/mailer.service';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { transformRouteObject } from 'common/utils/transformRouteObject';
-import { DeleteResult, EntityManager, EntityNotFoundError, In, Repository, Between } from 'typeorm';
+import { DeleteResult, EntityManager, EntityNotFoundError, Repository, Between } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
@@ -27,10 +25,8 @@ export class RouteService {
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
     @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
     private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
-    private readonly smtpService: MailerService,
   ) {}
 
   async create(createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
@@ -39,28 +35,6 @@ export class RouteService {
 
       for (const route of routes) {
         await this.routeRepo.save(route);
-      }
-      await this.entityManager.save(routes);
-
-      const driverIds = [...new Set(routes.map((route) => route.user_id))].filter(Boolean);
-
-      const users = await this.userRepo.find({
-        where: { id: In(driverIds) },
-      });
-
-      for (const user of users) {
-        await this.smtpService.sendEmail({
-          from: {
-            name: this.configService.getOrThrow('APP_NAME'),
-            address: this.configService.getOrThrow('DEFAULT_EMAIL_FROM'),
-          },
-          recipients: [{ name: user.full_name, address: user.email }],
-          subject: 'New Route Notification',
-          html: createRouteNotificationMail({
-            username: user.full_name,
-          }),
-          placeholderReplacements: {},
-        });
       }
 
       return { status: 201, message: 'Routes have been successfully created!' };
@@ -85,29 +59,27 @@ export class RouteService {
     }
   }
 
-  async getOneForDriver(id: number): Promise<RouteInform> {
+  async getOneForDriver(driverId: number, routeId: number): Promise<RouteInform> {
     try {
-      const route = await this.routeRepo.findOne({
-        where: { user_id: { id } },
+      const route = await this.routeRepo.findOneOrFail({
+        where: {
+          user_id: { id: driverId },
+          id: routeId,
+        },
         relations: ['orders'],
       });
 
-      if (!route) {
-        throw new NotFoundException('There is no such route');
-      }
       return transformRouteObject(route);
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof EntityNotFoundError) {
-        throw new BadRequestException(error.message);
-      }
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
+        throw new NotFoundException('There is no such route');
       }
       throw new InternalServerErrorException('Something went wrong');
     }
   }
 
   async getRouteFilters(startDate: Date, endDate: Date) {
+    // todo try catch statement
     const filters = await this.routeRepo
       .createQueryBuilder('route')
       .select(['DISTINCT user.full_name AS driver', 'COUNT(order.id) AS stopsCount', 'route.status AS status'])
@@ -183,6 +155,7 @@ export class RouteService {
       queryBuilder.orderBy(sortField === 'user_id.full_name' ? 'user.full_name' : `route.${sortField}`, sortOrder);
     }
 
+    // todo try catch statement
     const routes = await queryBuilder.getRawMany<RouteData>();
 
     if (!routes.length) {

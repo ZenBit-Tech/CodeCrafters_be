@@ -8,7 +8,7 @@ import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
 import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
 import { tranformOrderObject, TransformedOrder } from 'common/utils/transformOrderObject';
-import { FindManyOptions, IsNull, Like, Between, Not, Repository } from 'typeorm';
+import { FindManyOptions, IsNull, Like, Between, Not, Repository, EntityNotFoundError } from 'typeorm';
 
 import { OrderServiceParams } from './types';
 
@@ -193,27 +193,37 @@ export class OrdersService {
     }));
 
     const notAssignedOrders: Order[] = [];
-    const driverCount = drivers.length;
-    for (const order of orders) {
+
+    let orderIndex = 0;
+    for (const assignment of assignments) {
+      if (orderIndex < orders.length) {
+        assignment.orders.push(orders[orderIndex]);
+        orderIndex += 1;
+      }
+    }
+
+    while (orderIndex < orders.length) {
       let assigned = false;
 
-      for (let i = 0; i < driverCount; i += 1) {
-        const assignment = assignments[i];
+      for (const assignment of assignments) {
         const driverOrders = assignment.orders;
+        const currentOrder = orders[orderIndex];
 
         const hasSameStartTime = driverOrders.some(
-          (o) => new Date(o.collection_time_start).getTime() === new Date(order.collection_time_start).getTime(),
+          (o) => new Date(o.collection_time_start).getTime() === new Date(currentOrder.collection_time_start).getTime(),
         );
 
         if (!hasSameStartTime) {
-          assignment.orders.push(order);
+          assignment.orders.push(currentOrder);
           assigned = true;
+          orderIndex += 1;
           break;
         }
       }
 
       if (!assigned) {
-        notAssignedOrders.push(order);
+        notAssignedOrders.push(orders[orderIndex]);
+        orderIndex += 1;
       }
     }
 
@@ -291,6 +301,21 @@ export class OrdersService {
         .getRawMany<OrderWithRouteAndCustomer>();
     } catch (error) {
       throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async setFailedReason(orderId: number, reason: string): Promise<Order> {
+    try {
+      const order = await this.orderRepository.findOneOrFail({ where: { id: orderId } });
+
+      order.failed_reason = reason;
+
+      return await this.orderRepository.save(order);
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException('Order not found');
+      }
+      throw new InternalServerErrorException('Something went wrong while updating the order.');
     }
   }
 }
