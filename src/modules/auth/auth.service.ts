@@ -54,7 +54,7 @@ export class AuthService {
     }
   }
 
-  async tokenValidation(accessToken: string, role: Roles): Promise<{ token: string; role: Roles; companyId: number }> {
+  async tokenValidation(accessToken: string, role: Roles): Promise<{ token: string; role: Roles; companyId: number; email: string }> {
     try {
       const { email } = <jwt.JwtPayload>jwt.verify(accessToken, this.configService.getOrThrow('JWT_SECRET'));
 
@@ -69,7 +69,7 @@ export class AuthService {
 
       const { id: companyId } = user.company_id;
 
-      return { token: accessToken, role, companyId };
+      return { token: accessToken, role, companyId, email };
     } catch (error) {
       throw new BadRequestException('Invalid token');
     }
