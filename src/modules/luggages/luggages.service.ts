@@ -10,11 +10,13 @@ export class LuggagesService {
     private readonly luggageRepository: Repository<Luggage>,
   ) {}
 
-  async getCountOfLuggages(orderId: number): Promise<{ countOfLuggages: number }> {
+  async getCountOfLuggages(orderId: number): Promise<Luggage[]> {
     try {
-      const countOfLuggages = await this.luggageRepository.count({ where: { order: { id: orderId } } });
-
-      return { countOfLuggages };
+      return await this.luggageRepository
+        .createQueryBuilder('luggage')
+        .select(['luggage.id', 'luggage.luggage_type', 'luggage.luggage_weight', 'luggage.luggage_description'])
+        .where('luggage.order.id = :orderId', { orderId })
+        .getMany();
     } catch (error) {
       throw new NotFoundException('Cant find such luggages');
     }

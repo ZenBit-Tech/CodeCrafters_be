@@ -13,9 +13,9 @@ export class CustomersService {
     private readonly orderRepo: Repository<Order>,
   ) {}
 
-  async findOne(id: number): Promise<Customer> {
+  async findOne(orderId: number): Promise<Customer> {
     try {
-      return await this.customerRepo.findOneOrFail({ where: { id } });
+      return await this.customerRepo.findOneOrFail({ where: { orders: { id: orderId } } });
     } catch (error) {
       throw new NotFoundException('Customer not found');
     }

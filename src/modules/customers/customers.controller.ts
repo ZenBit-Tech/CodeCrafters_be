@@ -25,14 +25,14 @@ export class CustomersController {
     return this.customersService.verifyTicket(id, orderId);
   }
 
-  @Get(':id')
+  @Get('')
   @ApiOperation({ summary: 'Find a customer by ID' })
   @ApiParam({
     name: 'id',
     type: Number,
     description: 'The ID of the customer to retrieve',
   })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Customer> {
-    return this.customersService.findOne(id);
+  async findOne(@Query('orderId', ParseIntPipe) orderId: number): Promise<Customer> {
+    return this.customersService.findOne(orderId);
   }
 }
