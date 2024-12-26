@@ -12,6 +12,7 @@ import { stringToBoolean } from 'common/utils/stringToBoolean';
 import { TransformedOrder } from 'common/utils/transformOrderObject';
 
 import { OrdersResponse } from './dto/response.dto';
+import { OrderDetails } from './interfaces/orderDetails';
 import { OrdersService } from './orders.service';
 import { OrderQueryParams } from './types';
 
@@ -48,8 +49,41 @@ export class OrdersController {
   @SetMetadata('roles', [Roles.DRIVER])
   @ApiOperation({ summary: 'Get detailed information about specific Order' })
   @ApiParam({ name: 'id', description: 'Order id', example: 23 })
-  @ApiResponse({ status: 200, description: 'Get order details' })
-  async getOrderData(@Param('id', ParseIntPipe) id: number): Promise<Order> {
+  @ApiResponse({
+    status: 200,
+    description: 'Get order details',
+    example: {
+      collectionDate: '2024-12-31T00:00:00.000Z',
+      collectionTimeStart: '2024-12-31T09:05:00.000Z',
+      collectionTimeEnd: '2024-12-31T09:05:00.000Z',
+      collectionAddress: '202 Elm Ave, Columbus, OH',
+      airportName: 'John F. Kennedy International Airport',
+      flightId: 'Yss234jJi',
+      customerFullName: 'Charlie Brown',
+      customerPhoneNumber: '+380-63-345-6789',
+      dispatcherFullName: 'another driver',
+      dispatcherPhoneNumber: '+380559482317',
+      luggages: [
+        {
+          luggageType: 'big',
+          luggageWeight: 15,
+        },
+        {
+          luggageType: 'big',
+          luggageWeight: 15,
+        },
+        {
+          luggageType: 'middle',
+          luggageWeight: 7,
+        },
+        {
+          luggageType: 'middle',
+          luggageWeight: 7,
+        },
+      ],
+    },
+  })
+  async getOrderData(@Param('id', ParseIntPipe) id: number): Promise<OrderDetails> {
     return this.ordersService.getOne(id);
   }
 

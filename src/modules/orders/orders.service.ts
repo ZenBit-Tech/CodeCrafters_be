@@ -10,6 +10,7 @@ import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
 import { tranformOrderObject, TransformedOrder } from 'common/utils/transformOrderObject';
 import { FindManyOptions, IsNull, Like, Between, Not, Repository, EntityNotFoundError } from 'typeorm';
 
+import { OrderDetails } from './interfaces/orderDetails';
 import { OrderServiceParams } from './types';
 
 @Injectable()
@@ -137,9 +138,9 @@ export class OrdersService {
     }
   }
 
-  async getOne(id: number): Promise<Order> {
+  async getOne(id: number): Promise<OrderDetails> {
     try {
-      const order: Order | undefined = await this.orderRepository
+      const order: OrderDetails | undefined = await this.orderRepository
         .createQueryBuilder('order')
         .leftJoin('order.dispatcher', 'dispatcher')
         .leftJoin('order.customer', 'customer')
