@@ -50,7 +50,7 @@ export class OrdersService {
     const findSettings: FindManyOptions<Order> = {
       skip: (page - 1) * ORDER_PAGE_LENGTH,
       take: ORDER_PAGE_LENGTH,
-      relations: ['luggages', 'route'],
+      relations: ['luggages', 'route', 'customer'],
       where: search
         ? [
             {

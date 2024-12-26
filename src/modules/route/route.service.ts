@@ -6,7 +6,7 @@ import { ROUTE_START_POINT } from 'common/constants/strings';
 import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
-import { SortOrder } from 'common/enums/enums';
+import { OrderStatuses, RouteStatuses, SortOrder } from 'common/enums/enums';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { sortOrdersByRouteObject, transformRouteObject } from 'common/utils/transformRouteObject';
@@ -31,7 +31,39 @@ export class RouteService {
 
   async create(createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
     try {
-      const routes = createRouteDto.map((routeDto) => new Route(routeDto));
+      const routes = createRouteDto.map((routeDto) => {
+        const hasAtRiskOrders = routeDto.orders.some((currentOrder) => {
+          const countOfTheSame = routeDto.orders.reduce((count, order) => {
+            if (currentOrder.collection_time_start === order.collection_time_start) {
+              return count + 1;
+            }
+            return count;
+          }, 0);
+
+          return countOfTheSame > 1;
+        });
+
+        const routeStatus = hasAtRiskOrders ? RouteStatuses.AT_RISK : RouteStatuses.UPCOMING;
+
+        return new Route({
+          ...routeDto,
+          status: routeStatus,
+          orders: routeDto.orders.map((currentOrder) => {
+            const countOfTheSame = routeDto.orders.reduce((count, order) => {
+              if (currentOrder.collection_time_start === order.collection_time_start) {
+                return count + 1;
+              }
+              return count;
+            }, 0);
+
+            if (countOfTheSame > 1) {
+              return new Order({ ...currentOrder, status: OrderStatuses.AT_RISK });
+            }
+
+            return new Order({ ...currentOrder, status: OrderStatuses.UPCOMING });
+          }),
+        });
+      });
 
       for (const route of routes) {
         await this.routeRepo.save(route);
