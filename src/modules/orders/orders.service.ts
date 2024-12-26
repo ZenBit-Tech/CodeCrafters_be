@@ -359,6 +359,7 @@ export class OrdersService {
       const order = await this.orderRepository.findOneOrFail({ where: { id: orderId } });
 
       order.failed_reason = reason;
+      order.status = OrderStatuses.FAILED;
 
       return await this.orderRepository.save(order);
     } catch (error) {
