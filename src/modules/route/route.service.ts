@@ -309,15 +309,24 @@ export class RouteService {
 
   async deleteRoute(routeId: number): Promise<SuccessResponse> {
     try {
-      const deletedRoute: DeleteResult = await this.routeRepo.softDelete(routeId);
+      const route = await this.routeRepo.findOne({ where: { id: routeId }, relations: ['orders'] });
 
-      if (deletedRoute.affected !== undefined && deletedRoute.affected !== null) {
-        if (deletedRoute.affected < 1) throw new Error();
-      } else {
-        throw new Error();
+      if (!route) {
+        throw new NotFoundException('There is no such route');
       }
 
-      return { status: 200, message: 'route deleted successfully' };
+      const orderIds = route.orders.map((order) => order.id);
+      if (orderIds.length > 0) {
+        await this.orderRepo.update(orderIds, { route: null, status: OrderStatuses.EMPTY_STATUS });
+      }
+
+      const deletedRoute: DeleteResult = await this.routeRepo.softDelete(routeId);
+
+      if (!deletedRoute.affected || deletedRoute.affected < 1) {
+        throw new NotFoundException('There is no such route');
+      }
+
+      return { status: 200, message: 'Route deleted successfully' };
     } catch (error) {
       throw new NotFoundException('There is no such route');
     }
