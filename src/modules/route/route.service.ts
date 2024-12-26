@@ -246,9 +246,7 @@ export class RouteService {
         throw new BadRequestException();
       }
 
-      const order = await this.orderRepo.findOneOrFail({ where: { id: orderId } });
-      order.route = null;
-      await this.entityManager.save(order);
+      await this.orderRepo.update(orderId, { route: null, dispatcher: null, status: OrderStatuses.EMPTY_STATUS });
 
       const updatedRoute = await this.routeRepo.findOneOrFail({ where: { id: routeId }, relations: ['orders'] });
 
@@ -258,12 +256,39 @@ export class RouteService {
 
       await this.calculateRouteDistance([ROUTE_START_POINT, ...cities]).then(async (result) => {
         if (result) {
-          updatedRoute.distance = Math.ceil(result.distance / 1000);
-          await this.entityManager.save(updatedRoute);
+          const newDistance = Math.ceil(result.distance / 1000);
+          updatedRoute.distance = newDistance;
+          await this.routeRepo.update(routeId, { distance: newDistance });
         }
       });
 
-      return await this.getOne(routeId);
+      let hasOrdersWithTheSameTime = false;
+
+      for (const currentOrder of updatedRoute.orders) {
+        const sameOrders = updatedRoute.orders.reduce((amount, order) => {
+          if (currentOrder.collection_time_start === order.collection_time_start) {
+            return amount + 1;
+          }
+          return amount;
+        }, 0);
+
+        if (sameOrders > 1) {
+          hasOrdersWithTheSameTime = true;
+        }
+
+        if (!hasOrdersWithTheSameTime && currentOrder.status === OrderStatuses.AT_RISK) {
+          await this.orderRepo.update(currentOrder.id, { status: OrderStatuses.UPCOMING });
+
+          currentOrder.status = OrderStatuses.UPCOMING;
+        }
+      }
+
+      if (!hasOrdersWithTheSameTime && updatedRoute.status === RouteStatuses.AT_RISK) {
+        updatedRoute.status = RouteStatuses.UPCOMING;
+        await this.routeRepo.update(routeId, { status: RouteStatuses.UPCOMING });
+      }
+
+      return transformRouteObject(updatedRoute);
     } catch (error) {
       throw new NotFoundException('There is no such order');
     }

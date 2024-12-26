@@ -17,6 +17,7 @@ export enum OrderStatuses {
   NOT_ARRIVED = 'Not arrived',
   AT_RISK = 'At Risk',
   UPCOMING = 'Upcoming',
+  EMPTY_STATUS = '',
 }
 export enum Roles {
   DRIVER = 'driver',

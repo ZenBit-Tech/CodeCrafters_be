@@ -43,7 +43,7 @@ export class Order {
   customer: Customer;
 
   @ManyToOne(() => User, (dispatcher) => dispatcher.orders)
-  dispatcher: User;
+  dispatcher: User | null;
 
   @ManyToOne(() => Route, (route) => route.orders)
   route: Route | null;
