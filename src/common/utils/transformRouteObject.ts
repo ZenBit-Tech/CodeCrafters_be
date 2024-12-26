@@ -23,3 +23,11 @@ export const transformRouteObject = (routeObject: Route): RouteInform => {
     })),
   };
 };
+
+export const sortOrdersByRouteObject = (routeInformObject: RouteInform): RouteInform => {
+  const sortedOrders = routeInformObject.orders.sort((a, b) => a.collection_time_start.getHours() - b.collection_time_start.getHours());
+  return {
+    ...routeInformObject,
+    orders: sortedOrders,
+  };
+};

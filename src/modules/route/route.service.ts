@@ -9,7 +9,7 @@ import { User } from 'common/database/entities/user.entity';
 import { SortOrder } from 'common/enums/enums';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
-import { transformRouteObject } from 'common/utils/transformRouteObject';
+import { sortOrdersByRouteObject, transformRouteObject } from 'common/utils/transformRouteObject';
 import { DeleteResult, EntityManager, EntityNotFoundError, Repository, Between } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
@@ -69,7 +69,9 @@ export class RouteService {
         relations: ['orders'],
       });
 
-      return transformRouteObject(route);
+      const routeInformObject = transformRouteObject(route);
+
+      return sortOrdersByRouteObject(routeInformObject);
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('There is no such route');
