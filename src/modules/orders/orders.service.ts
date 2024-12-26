@@ -313,6 +313,16 @@ export class OrdersService {
     }
   }
 
+  async updateOrderStatus(id: number, status: OrderStatuses): Promise<boolean> {
+    try {
+      await this.orderRepository.update(id, { status });
+
+      return true;
+    } catch (error) {
+      throw new NotFoundException('');
+    }
+  }
+
   async getOrdersByDriverAndDate(driverId: number, date: Date): Promise<OrderWithRouteAndCustomer[]> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);

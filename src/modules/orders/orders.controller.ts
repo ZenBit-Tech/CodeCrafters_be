@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
 import { ParseAssignOrdersJson } from 'common/decorators/parseJsonDecorator';
-import { Roles } from 'common/enums/enums';
+import { OrderStatuses, Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
 import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { FailedResponse } from 'common/types/failed-response.dto';
@@ -142,6 +142,13 @@ export class OrdersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async setFailedReason(@Body('orderId') orderId: number, @Body('reason') reason: string): Promise<Order> {
     return this.ordersService.setFailedReason(orderId, reason);
+  }
+
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  async changeOrderStatus(@Param('id', ParseIntPipe) id: number, @Body('status') status: OrderStatuses): Promise<boolean> {
+    return this.ordersService.updateOrderStatus(id, status);
   }
 
   @Get(':id')
