@@ -44,49 +44,6 @@ export class OrdersController {
     return this.ordersService.findAll({ ...queryParams, isNew: stringToBoolean(queryParams.isNew) });
   }
 
-  @Get(':id')
-  @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.DRIVER])
-  @ApiOperation({ summary: 'Get detailed information about specific Order' })
-  @ApiParam({ name: 'id', description: 'Order id', example: 23 })
-  @ApiResponse({
-    status: 200,
-    description: 'Get order details',
-    example: {
-      collectionDate: '2024-12-31T00:00:00.000Z',
-      collectionTimeStart: '2024-12-31T09:05:00.000Z',
-      collectionTimeEnd: '2024-12-31T09:05:00.000Z',
-      collectionAddress: '202 Elm Ave, Columbus, OH',
-      airportName: 'John F. Kennedy International Airport',
-      flightId: 'Yss234jJi',
-      customerFullName: 'Charlie Brown',
-      customerPhoneNumber: '+380-63-345-6789',
-      dispatcherFullName: 'another driver',
-      dispatcherPhoneNumber: '+380559482317',
-      luggages: [
-        {
-          luggageType: 'big',
-          luggageWeight: 15,
-        },
-        {
-          luggageType: 'big',
-          luggageWeight: 15,
-        },
-        {
-          luggageType: 'middle',
-          luggageWeight: 7,
-        },
-        {
-          luggageType: 'middle',
-          luggageWeight: 7,
-        },
-      ],
-    },
-  })
-  async getOrderData(@Param('id', ParseIntPipe) id: number): Promise<OrderDetails> {
-    return this.ordersService.getOne(id);
-  }
-
   @Get('boarding-pass/:id')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])
@@ -158,7 +115,10 @@ export class OrdersController {
     },
   })
   @ApiResponse({ status: 500, type: FailedResponse })
-  async findOrdersByDriverAndDate(@Query() { date, driverId }: { date: Date; driverId: number }): Promise<OrderWithRouteAndCustomer[]> {
+  async findOrdersByDriverAndDate(
+    @Query('date') date: string,
+    @Query('driverId', ParseIntPipe) driverId: number,
+  ): Promise<OrderWithRouteAndCustomer[]> {
     const parsedDate = new Date(date);
     return this.ordersService.getOrdersByDriverAndDate(driverId, parsedDate);
   }
@@ -182,5 +142,48 @@ export class OrdersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async setFailedReason(@Body('orderId') orderId: number, @Body('reason') reason: string): Promise<Order> {
     return this.ordersService.setFailedReason(orderId, reason);
+  }
+
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Get detailed information about specific Order' })
+  @ApiParam({ name: 'id', description: 'Order id', example: 23 })
+  @ApiResponse({
+    status: 200,
+    description: 'Get order details',
+    example: {
+      collectionDate: '2024-12-31T00:00:00.000Z',
+      collectionTimeStart: '2024-12-31T09:05:00.000Z',
+      collectionTimeEnd: '2024-12-31T09:05:00.000Z',
+      collectionAddress: '202 Elm Ave, Columbus, OH',
+      airportName: 'John F. Kennedy International Airport',
+      flightId: 'Yss234jJi',
+      customerFullName: 'Charlie Brown',
+      customerPhoneNumber: '+380-63-345-6789',
+      dispatcherFullName: 'another driver',
+      dispatcherPhoneNumber: '+380559482317',
+      luggages: [
+        {
+          luggageType: 'big',
+          luggageWeight: 15,
+        },
+        {
+          luggageType: 'big',
+          luggageWeight: 15,
+        },
+        {
+          luggageType: 'middle',
+          luggageWeight: 7,
+        },
+        {
+          luggageType: 'middle',
+          luggageWeight: 7,
+        },
+      ],
+    },
+  })
+  async getOrderData(@Param('id', ParseIntPipe) id: number): Promise<OrderDetails> {
+    return this.ordersService.getOne(id);
   }
 }
