@@ -139,7 +139,38 @@ export class OrdersService {
 
   async getOne(id: number): Promise<Order> {
     try {
-      return await this.orderRepository.findOneOrFail({ where: { id }, relations: ['dispatcher'] });
+      const order: Order | undefined = await this.orderRepository
+        .createQueryBuilder('order')
+        .leftJoin('order.dispatcher', 'dispatcher')
+        .leftJoin('order.customer', 'customer')
+        .leftJoin('order.luggages', 'luggages')
+        .select([
+          'order.collection_date AS collectionDate',
+          'order.collection_time_start AS collectionTimeStart',
+          'order.collection_time_end AS collectionTimeEnd',
+          'order.collection_address AS collectionAddress',
+          'order.airport_name AS airportName',
+          'order.flight_id AS flightId',
+          'customer.full_name AS customerFullName',
+          'customer.phone_number AS customerPhoneNumber',
+          'dispatcher.full_name AS dispatcherFullName',
+          'dispatcher.phone_number AS dispatcherPhoneNumber',
+          `JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'luggageType', luggages.luggage_type,
+              'luggageWeight', luggages.luggage_weight
+            )
+          ) AS luggages`,
+        ])
+        .where('order.id = :id', { id })
+        .groupBy('order.id, customer.id, dispatcher.id')
+        .getRawOne();
+
+      if (typeof order === 'undefined') {
+        throw new Error();
+      }
+
+      return order;
     } catch (error) {
       throw new NotFoundException('');
     }
