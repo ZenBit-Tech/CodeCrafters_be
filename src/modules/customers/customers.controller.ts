@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Customer } from 'common/database/entities/customer.entity';
 
 import { CustomersService } from './customers.service';
@@ -31,6 +31,11 @@ export class CustomersController {
     name: 'id',
     type: Number,
     description: 'The ID of the customer to retrieve',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved customer',
+    type: Customer,
   })
   async findOne(@Query('orderId', ParseIntPipe) orderId: number): Promise<Customer> {
     return this.customersService.findOne(orderId);
