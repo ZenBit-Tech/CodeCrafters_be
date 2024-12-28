@@ -147,6 +147,7 @@ export class OrdersService {
         .leftJoin('order.luggages', 'luggages')
         .select([
           'order.collection_date AS collectionDate',
+          'order.status AS status',
           'order.collection_time_start AS collectionTimeStart',
           'order.collection_time_end AS collectionTimeEnd',
           'order.collection_address AS collectionAddress',

@@ -1,4 +1,4 @@
-import { LuggageTypes } from 'common/enums/enums';
+import { LuggageTypes, OrderStatuses } from 'common/enums/enums';
 
 interface TransformedLuggage {
   luggageType: LuggageTypes;
@@ -7,6 +7,7 @@ interface TransformedLuggage {
 
 export interface OrderDetails {
   collectionDate: Date;
+  status: OrderStatuses;
   collectionTimeStart: Date;
   collectionTimeEnd: Date;
   collectionAddress: string;
