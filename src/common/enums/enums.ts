@@ -24,6 +24,9 @@ export enum OrderStatuses {
   BOARDING_PASS_VERIFIED = 'Boarding pass verified',
   BAGGAGE_CONFIRMED = 'Baggage confirmed',
   CUSTOMER_CONFIRMED = 'Customer confirmed',
+  BAGGAGE_RECORDED = 'Baggage recorded',
+  BAGGAGE_COVERED = 'Baggage covered',
+  LOADED_INTO_VEHICLE = 'Loaded into vehicle',
 }
 export enum Roles {
   DRIVER = 'driver',
