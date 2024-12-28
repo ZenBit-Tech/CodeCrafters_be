@@ -3,10 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { ROUTE_START_POINT } from 'common/constants/strings';
+import { Notification } from 'common/database/entities/notification.entity';
 import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
-import { OrderStatuses, RouteStatuses, SortOrder } from 'common/enums/enums';
+import { NotificationTypes, OrderStatuses, RouteStatuses, SortOrder } from 'common/enums/enums';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { sortOrdersByRouteObject, transformRouteObject } from 'common/utils/transformRouteObject';
@@ -24,6 +25,8 @@ export class RouteService {
     private readonly routeRepo: Repository<Route>,
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
+    @InjectRepository(Notification)
+    private readonly notificationRepo: Repository<Notification>,
     @InjectRepository(User)
     private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
@@ -31,6 +34,7 @@ export class RouteService {
 
   async create(createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
     try {
+      const notifications: Notification[] = [];
       const routes = createRouteDto.map((routeDto) => {
         const hasAtRiskOrders = routeDto.orders.some((currentOrder) => {
           const countOfTheSame = routeDto.orders.reduce((count, order) => {
@@ -66,7 +70,23 @@ export class RouteService {
       });
 
       for (const route of routes) {
-        await this.routeRepo.save(route);
+        const savedRoute = await this.routeRepo.save(route);
+        const { user_id: driver } = savedRoute;
+
+        notifications.push(
+          new Notification({
+            type: NotificationTypes.ROUTE,
+            is_readed: false,
+            link_text: `${savedRoute.id}`,
+            link_href: ``,
+            message: 'You have received a new route',
+            user_id: driver,
+          }),
+        );
+      }
+
+      if (notifications.length > 0) {
+        await this.notificationRepo.save(notifications);
       }
 
       return { status: 201, message: 'Routes have been successfully created!' };
