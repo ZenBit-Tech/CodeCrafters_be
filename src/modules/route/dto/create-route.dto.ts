@@ -1,4 +1,5 @@
 import { Company } from 'common/database/entities/company.entity';
+import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
 import { RouteStatuses } from 'common/enums/enums';
 
@@ -9,4 +10,5 @@ export class CreateRouteDto {
   status: RouteStatuses;
   user_id: User;
   company_id: Company;
+  orders: Order[];
 }

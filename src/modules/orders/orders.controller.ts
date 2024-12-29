@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
 import { ParseAssignOrdersJson } from 'common/decorators/parseJsonDecorator';
-import { Roles } from 'common/enums/enums';
+import { OrderStatuses, Roles } from 'common/enums/enums';
 import { RolesGuard } from 'common/guards/roles.guard';
 import { AssignedOrdersResponse } from 'common/types/assignedOrdersResponse';
 import { FailedResponse } from 'common/types/failed-response.dto';
@@ -12,6 +12,7 @@ import { stringToBoolean } from 'common/utils/stringToBoolean';
 import { TransformedOrder } from 'common/utils/transformOrderObject';
 
 import { OrdersResponse } from './dto/response.dto';
+import { OrderDetails } from './interfaces/orderDetails';
 import { OrdersService } from './orders.service';
 import { OrderQueryParams } from './types';
 
@@ -114,7 +115,10 @@ export class OrdersController {
     },
   })
   @ApiResponse({ status: 500, type: FailedResponse })
-  async findOrdersByDriverAndDate(@Query() { date, driverId }: { date: Date; driverId: number }): Promise<OrderWithRouteAndCustomer[]> {
+  async findOrdersByDriverAndDate(
+    @Query('date') date: string,
+    @Query('driverId', ParseIntPipe) driverId: number,
+  ): Promise<OrderWithRouteAndCustomer[]> {
     const parsedDate = new Date(date);
     return this.ordersService.getOrdersByDriverAndDate(driverId, parsedDate);
   }
@@ -138,5 +142,55 @@ export class OrdersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async setFailedReason(@Body('orderId') orderId: number, @Body('reason') reason: string): Promise<Order> {
     return this.ordersService.setFailedReason(orderId, reason);
+  }
+
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  async changeOrderStatus(@Param('id', ParseIntPipe) id: number, @Body('status') status: OrderStatuses): Promise<boolean> {
+    return this.ordersService.updateOrderStatus(id, status);
+  }
+
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({ summary: 'Get detailed information about specific Order' })
+  @ApiParam({ name: 'id', description: 'Order id', example: 23 })
+  @ApiResponse({
+    status: 200,
+    description: 'Get order details',
+    example: {
+      collectionDate: '2024-12-31T00:00:00.000Z',
+      collectionTimeStart: '2024-12-31T09:05:00.000Z',
+      collectionTimeEnd: '2024-12-31T09:05:00.000Z',
+      collectionAddress: '202 Elm Ave, Columbus, OH',
+      airportName: 'John F. Kennedy International Airport',
+      flightId: 'Yss234jJi',
+      customerFullName: 'Charlie Brown',
+      customerPhoneNumber: '+380-63-345-6789',
+      dispatcherFullName: 'another driver',
+      dispatcherPhoneNumber: '+380559482317',
+      luggages: [
+        {
+          luggageType: 'big',
+          luggageWeight: 15,
+        },
+        {
+          luggageType: 'big',
+          luggageWeight: 15,
+        },
+        {
+          luggageType: 'middle',
+          luggageWeight: 7,
+        },
+        {
+          luggageType: 'middle',
+          luggageWeight: 7,
+        },
+      ],
+    },
+  })
+  async getOrderData(@Param('id', ParseIntPipe) id: number): Promise<OrderDetails> {
+    return this.ordersService.getOne(id);
   }
 }
