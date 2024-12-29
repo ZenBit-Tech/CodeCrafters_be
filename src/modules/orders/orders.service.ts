@@ -153,6 +153,7 @@ export class OrdersService {
           'order.collection_address AS collectionAddress',
           'order.airport_name AS airportName',
           'order.flight_id AS flightId',
+          'customer.id AS customerId',
           'customer.full_name AS customerFullName',
           'customer.phone_number AS customerPhoneNumber',
           'dispatcher.full_name AS dispatcherFullName',
