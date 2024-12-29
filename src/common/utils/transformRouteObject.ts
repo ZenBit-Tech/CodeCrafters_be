@@ -19,6 +19,7 @@ export const transformRouteObject = (routeObject: Route): RouteInform => {
       collection_time_start: order.collection_time_start,
       collection_time_end: order.collection_time_end,
       collection_address: order.collection_address,
+      failed_reason: order.failed_reason,
       status: order.status,
     })),
   };

@@ -7,6 +7,7 @@ export interface RouteData {
   route_companyIdId: number;
   route_userIdId: number;
   ordersCount: string;
+  failed_reason: string | null;
 
   company_id: number;
   company_name: string;
@@ -28,6 +29,6 @@ export interface RouteData {
 
 export interface FilterData {
   driver: string;
-  stopsCount: number;
+  stopsCount: string;
   status: string;
 }
