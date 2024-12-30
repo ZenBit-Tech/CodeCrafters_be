@@ -11,6 +11,7 @@ import { tranformOrderObject, TransformedOrder } from 'common/utils/transformOrd
 import { FindManyOptions, IsNull, Like, Between, Not, Repository, EntityNotFoundError } from 'typeorm';
 
 import { OrderDto } from './dto/order.dto';
+import { OrderDetails } from './interfaces/orderDetails';
 import { OrderServiceParams } from './types';
 
 @Injectable()
@@ -50,7 +51,7 @@ export class OrdersService {
     const findSettings: FindManyOptions<Order> = {
       skip: (page - 1) * ORDER_PAGE_LENGTH,
       take: ORDER_PAGE_LENGTH,
-      relations: ['luggages', 'route'],
+      relations: ['luggages', 'route', 'customer'],
       where: search
         ? [
             {
@@ -138,9 +139,49 @@ export class OrdersService {
     }
   }
 
+  async getOne(id: number): Promise<OrderDetails> {
+    try {
+      const order: OrderDetails | undefined = await this.orderRepository
+        .createQueryBuilder('order')
+        .leftJoin('order.dispatcher', 'dispatcher')
+        .leftJoin('order.customer', 'customer')
+        .leftJoin('order.luggages', 'luggages')
+        .select([
+          'order.collection_date AS collectionDate',
+          'order.status AS status',
+          'order.collection_time_start AS collectionTimeStart',
+          'order.collection_time_end AS collectionTimeEnd',
+          'order.collection_address AS collectionAddress',
+          'order.airport_name AS airportName',
+          'order.flight_id AS flightId',
+          'customer.full_name AS customerFullName',
+          'customer.phone_number AS customerPhoneNumber',
+          'dispatcher.full_name AS dispatcherFullName',
+          'dispatcher.phone_number AS dispatcherPhoneNumber',
+          `JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'luggageType', luggages.luggage_type,
+              'luggageWeight', luggages.luggage_weight
+            )
+          ) AS luggages`,
+        ])
+        .where('order.id = :id', { id })
+        .groupBy('order.id, customer.id, dispatcher.id')
+        .getRawOne();
+
+      if (typeof order === 'undefined') {
+        throw new Error();
+      }
+
+      return order;
+    } catch (error) {
+      throw new NotFoundException('');
+    }
+  }
+
   async getOneForBoardingPass(id: number): Promise<TransformedOrder> {
     try {
-      const order = await this.orderRepository.findOneOrFail({ where: { id } });
+      const order = await this.orderRepository.findOneOrFail({ where: { id }, relations: ['customer'] });
 
       return tranformOrderObject(order);
     } catch (error) {
@@ -274,6 +315,16 @@ export class OrdersService {
     }
   }
 
+  async updateOrderStatus(id: number, status: OrderStatuses): Promise<boolean> {
+    try {
+      await this.orderRepository.update(id, { status });
+
+      return true;
+    } catch (error) {
+      throw new NotFoundException('');
+    }
+  }
+
   async getOrdersByDriverAndDate(driverId: number, date: Date): Promise<OrderWithRouteAndCustomer[]> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
@@ -310,6 +361,7 @@ export class OrdersService {
       const order = await this.orderRepository.findOneOrFail({ where: { id: orderId } });
 
       order.failed_reason = reason;
+      order.status = OrderStatuses.FAILED;
 
       return await this.orderRepository.save(order);
     } catch (error) {

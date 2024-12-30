@@ -20,6 +20,7 @@ import { DatabaseModule } from './common/database/database.module';
 import { MailerModule } from './common/mailer/mailer.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { LuggagesModule } from './modules/luggages/luggages.module';
 import { ModuleExampleModule } from './modules/module-example/module-example.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { RouteModule } from './modules/route/route.module';
@@ -49,6 +50,7 @@ import { UserModule } from './modules/user/user.module';
     TicketsModule,
     CustomersModule,
     LuggageImagesModule,
+    LuggagesModule,
   ],
   controllers: [],
   providers: [],

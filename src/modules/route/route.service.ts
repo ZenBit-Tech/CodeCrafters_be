@@ -3,13 +3,14 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { ROUTE_START_POINT } from 'common/constants/strings';
+import { Notification } from 'common/database/entities/notification.entity';
 import { Order } from 'common/database/entities/order.entity';
 import { Route } from 'common/database/entities/route.entity';
 import { User } from 'common/database/entities/user.entity';
-import { SortOrder } from 'common/enums/enums';
+import { NotificationTypes, OrderStatuses, RouteStatuses, SortOrder } from 'common/enums/enums';
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
-import { transformRouteObject } from 'common/utils/transformRouteObject';
+import { sortOrdersByRouteObject, transformRouteObject } from 'common/utils/transformRouteObject';
 import { DeleteResult, EntityManager, EntityNotFoundError, Repository, Between } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
@@ -24,6 +25,8 @@ export class RouteService {
     private readonly routeRepo: Repository<Route>,
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
+    @InjectRepository(Notification)
+    private readonly notificationRepo: Repository<Notification>,
     @InjectRepository(User)
     private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
@@ -31,10 +34,59 @@ export class RouteService {
 
   async create(createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
     try {
-      const routes = createRouteDto.map((routeDto) => new Route(routeDto));
+      const notifications: Notification[] = [];
+      const routes = createRouteDto.map((routeDto) => {
+        const hasAtRiskOrders = routeDto.orders.some((currentOrder) => {
+          const countOfTheSame = routeDto.orders.reduce((count, order) => {
+            if (currentOrder.collection_time_start === order.collection_time_start) {
+              return count + 1;
+            }
+            return count;
+          }, 0);
+
+          return countOfTheSame > 1;
+        });
+
+        const routeStatus = hasAtRiskOrders ? RouteStatuses.AT_RISK : RouteStatuses.UPCOMING;
+
+        return new Route({
+          ...routeDto,
+          status: routeStatus,
+          orders: routeDto.orders.map((currentOrder) => {
+            const countOfTheSame = routeDto.orders.reduce((count, order) => {
+              if (currentOrder.collection_time_start === order.collection_time_start) {
+                return count + 1;
+              }
+              return count;
+            }, 0);
+
+            if (countOfTheSame > 1) {
+              return new Order({ ...currentOrder, status: OrderStatuses.AT_RISK });
+            }
+
+            return new Order({ ...currentOrder, status: OrderStatuses.UPCOMING });
+          }),
+        });
+      });
 
       for (const route of routes) {
-        await this.routeRepo.save(route);
+        const savedRoute = await this.routeRepo.save(route);
+        const { user_id: driver } = savedRoute;
+
+        notifications.push(
+          new Notification({
+            type: NotificationTypes.ROUTE,
+            is_readed: false,
+            link_text: `${savedRoute.id}`,
+            link_href: ``,
+            message: 'You have received a new route',
+            user_id: driver,
+          }),
+        );
+      }
+
+      if (notifications.length > 0) {
+        await this.notificationRepo.save(notifications);
       }
 
       return { status: 201, message: 'Routes have been successfully created!' };
@@ -69,7 +121,9 @@ export class RouteService {
         relations: ['orders'],
       });
 
-      return transformRouteObject(route);
+      const routeInformObject = transformRouteObject(route);
+
+      return sortOrdersByRouteObject(routeInformObject);
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('There is no such route');
@@ -219,9 +273,7 @@ export class RouteService {
         throw new BadRequestException();
       }
 
-      const order = await this.orderRepo.findOneOrFail({ where: { id: orderId } });
-      order.route = null;
-      await this.entityManager.save(order);
+      await this.orderRepo.update(orderId, { route: null, dispatcher: null, status: OrderStatuses.EMPTY_STATUS });
 
       const updatedRoute = await this.routeRepo.findOneOrFail({ where: { id: routeId }, relations: ['orders'] });
 
@@ -231,12 +283,39 @@ export class RouteService {
 
       await this.calculateRouteDistance([ROUTE_START_POINT, ...cities]).then(async (result) => {
         if (result) {
-          updatedRoute.distance = Math.ceil(result.distance / 1000);
-          await this.entityManager.save(updatedRoute);
+          const newDistance = Math.ceil(result.distance / 1000);
+          updatedRoute.distance = newDistance;
+          await this.routeRepo.update(routeId, { distance: newDistance });
         }
       });
 
-      return await this.getOne(routeId);
+      let hasOrdersWithTheSameTime = false;
+
+      for (const currentOrder of updatedRoute.orders) {
+        const sameOrders = updatedRoute.orders.reduce((amount, order) => {
+          if (currentOrder.collection_time_start === order.collection_time_start) {
+            return amount + 1;
+          }
+          return amount;
+        }, 0);
+
+        if (sameOrders > 1) {
+          hasOrdersWithTheSameTime = true;
+        }
+
+        if (!hasOrdersWithTheSameTime && currentOrder.status === OrderStatuses.AT_RISK) {
+          await this.orderRepo.update(currentOrder.id, { status: OrderStatuses.UPCOMING });
+
+          currentOrder.status = OrderStatuses.UPCOMING;
+        }
+      }
+
+      if (!hasOrdersWithTheSameTime && updatedRoute.status === RouteStatuses.AT_RISK) {
+        updatedRoute.status = RouteStatuses.UPCOMING;
+        await this.routeRepo.update(routeId, { status: RouteStatuses.UPCOMING });
+      }
+
+      return transformRouteObject(updatedRoute);
     } catch (error) {
       throw new NotFoundException('There is no such order');
     }
@@ -257,15 +336,24 @@ export class RouteService {
 
   async deleteRoute(routeId: number): Promise<SuccessResponse> {
     try {
-      const deletedRoute: DeleteResult = await this.routeRepo.softDelete(routeId);
+      const route = await this.routeRepo.findOne({ where: { id: routeId }, relations: ['orders'] });
 
-      if (deletedRoute.affected !== undefined && deletedRoute.affected !== null) {
-        if (deletedRoute.affected < 1) throw new Error();
-      } else {
-        throw new Error();
+      if (!route) {
+        throw new NotFoundException('There is no such route');
       }
 
-      return { status: 200, message: 'route deleted successfully' };
+      const orderIds = route.orders.map((order) => order.id);
+      if (orderIds.length > 0) {
+        await this.orderRepo.update(orderIds, { route: null, status: OrderStatuses.EMPTY_STATUS });
+      }
+
+      const deletedRoute: DeleteResult = await this.routeRepo.softDelete(routeId);
+
+      if (!deletedRoute.affected || deletedRoute.affected < 1) {
+        throw new NotFoundException('There is no such route');
+      }
+
+      return { status: 200, message: 'Route deleted successfully' };
     } catch (error) {
       throw new NotFoundException('There is no such route');
     }
