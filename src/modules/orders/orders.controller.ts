@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, SetMetadata, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
 import { ParseAssignOrdersJson } from 'common/decorators/parseJsonDecorator';
@@ -142,6 +142,52 @@ export class OrdersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async setFailedReason(@Body('orderId') orderId: number, @Body('reason') reason: string): Promise<Order> {
     return this.ordersService.setFailedReason(orderId, reason);
+  }
+
+  @Patch('locking-baggage/:id')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.DRIVER])
+  @ApiOperation({
+    summary: 'Lock baggage',
+    description: 'Locks a baggage item by its ID and updates the lock number.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'The ID of the baggage item to lock.',
+    required: true,
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        lockNumber: {
+          type: 'string',
+          description: 'The lock number to set for the baggage.',
+          example: '12345LOCK',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Baggage locked successfully.',
+    type: Boolean,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid ID or lock number provided.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Baggage item not found.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Unexpected error while locking baggage.',
+  })
+  async lockBaggage(@Param('id', ParseIntPipe) id: number, @Body() { lockNumber }: { lockNumber: string }): Promise<boolean> {
+    return this.ordersService.lockBaggage(id, lockNumber);
   }
 
   @Patch(':id')

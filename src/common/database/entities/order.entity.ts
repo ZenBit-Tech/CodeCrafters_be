@@ -12,6 +12,12 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ default: false })
+  is_order_locked: boolean;
+
+  @Column()
+  lock_number: string;
+
   @Column({ nullable: false })
   collection_date: Date;
 

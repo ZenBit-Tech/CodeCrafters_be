@@ -179,6 +179,16 @@ export class OrdersService {
     }
   }
 
+  async lockBaggage(orderId: number, lockNumber: string): Promise<boolean> {
+    try {
+      await this.orderRepository.update(orderId, { lock_number: lockNumber, is_order_locked: true });
+
+      return true;
+    } catch (error) {
+      throw new NotFoundException();
+    }
+  }
+
   async getOneForBoardingPass(id: number): Promise<TransformedOrder> {
     try {
       const order = await this.orderRepository.findOneOrFail({ where: { id }, relations: ['customer'] });
