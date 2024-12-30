@@ -214,18 +214,21 @@ export class RouteService {
       queryBuilder.orderBy(sortField === 'user_id.full_name' ? 'user.full_name' : `route.${sortField}`, sortOrder);
     }
 
-    // todo try catch statement
-    const routes = await queryBuilder.getRawMany<RouteData>();
+    try {
+      const routes = await queryBuilder.getRawMany<RouteData>();
 
-    if (!routes.length) {
-      if (searchQuery) {
-        throw new NotFoundException(new ErrorResponse(404, `No routes found for user with name matching "${searchQuery}"`));
-      } else {
-        throw new NotFoundException(new ErrorResponse(404, 'No routes found in the specified date range'));
+      if (!routes.length) {
+        if (searchQuery) {
+          throw new NotFoundException(new ErrorResponse(404, `No routes found for user with name matching "${searchQuery}"`));
+        } else {
+          throw new NotFoundException(new ErrorResponse(404, 'No routes found in the specified date range'));
+        }
       }
-    }
 
-    return routes;
+      return routes;
+    } catch (error) {
+      throw new InternalServerErrorException(new ErrorResponse(500, 'An error occurred while fetching routes.'));
+    }
   }
 
   async calculateRouteDistance(cities: string[]) {
