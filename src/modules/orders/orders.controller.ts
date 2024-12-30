@@ -164,7 +164,7 @@ export class OrdersController {
         lockNumber: {
           type: 'string',
           description: 'The lock number to set for the baggage.',
-          example: '12345LOCK',
+          example: '123456987456',
         },
       },
     },
