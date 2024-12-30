@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
+import { CustomerSign } from './customer-sign.entity';
 import { Order } from './order.entity';
 
 @Entity()
@@ -21,6 +22,9 @@ export class Customer {
 
   @OneToMany(() => Order, (order) => order.customer, { cascade: true })
   orders: Order[];
+
+  @OneToMany(() => CustomerSign, (sign) => sign.customer, { cascade: true, eager: true })
+  signs: CustomerSign[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
