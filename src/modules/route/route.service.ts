@@ -207,9 +207,7 @@ export class RouteService {
     }
 
     if (isRouteTimeSort) {
-      queryBuilder
-        .addSelect(`TIMESTAMPDIFF(MINUTE, route.submission_date, route.arrival_date)`, 'routeMinutes')
-        .orderBy('routeMinutes', sortOrder);
+      queryBuilder.orderBy('route.submission_date', sortOrder);
     } else if (sortField === 'ordersCount') {
       queryBuilder.orderBy('ordersCount', sortOrder);
     } else {
