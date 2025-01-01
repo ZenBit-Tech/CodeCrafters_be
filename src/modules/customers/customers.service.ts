@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CustomerSign } from 'common/database/entities/customer-sign.entity';
 import { Customer } from 'common/database/entities/customer.entity';
 import { Order } from 'common/database/entities/order.entity';
 import { Repository } from 'typeorm';
@@ -11,7 +12,19 @@ export class CustomersService {
     private readonly customerRepo: Repository<Customer>,
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
+    @InjectRepository(CustomerSign)
+    private readonly customerSignRepo: Repository<CustomerSign>,
   ) {}
+
+  async storeCustomerSign(customerId: number, filePath: string): Promise<boolean> {
+    try {
+      await this.customerSignRepo.save(new CustomerSign({ path: filePath, customer: new Customer({ id: customerId }) }));
+
+      return true;
+    } catch (error) {
+      throw new NotFoundException();
+    }
+  }
 
   async findOne(orderId: number): Promise<Customer> {
     try {

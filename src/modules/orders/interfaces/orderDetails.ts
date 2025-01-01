@@ -13,6 +13,7 @@ export interface OrderDetails {
   collectionAddress: string;
   airportName: string;
   flightId: string;
+  customerId: number;
   customerFullName: string;
   customerPhoneNumber: string;
   dispatcherFullName: string;

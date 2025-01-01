@@ -4,6 +4,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Company } from 'common/database/entities/company.entity';
+import { CustomerSign } from 'common/database/entities/customer-sign.entity';
 import { Customer } from 'common/database/entities/customer.entity';
 import { LuggageImages } from 'common/database/entities/luggage-imgs.entity';
 import { Luggage } from 'common/database/entities/luggage.entity';
@@ -31,7 +32,7 @@ import { UserModule } from './modules/user/user.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
-    TypeOrmModule.forFeature([User, Route, Company, Order, Notification, Luggage, LuggageImages, Customer]),
+    TypeOrmModule.forFeature([User, Route, Company, Order, Notification, Luggage, LuggageImages, Customer, CustomerSign]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
