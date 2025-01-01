@@ -42,7 +42,7 @@ export class DispatcherService {
     try {
       const dispatcher = await this.userRepo.findOneByOrFail({ id });
 
-      await this.userRepo.update(id, { ...updateDispatcherDto });
+      await this.userRepo.update(id, { ...updateDispatcherDto, company_id: { id: updateDispatcherDto.company_id } });
       return { status: 200, message: `Dispatcher ${dispatcher.full_name} updated successfully` };
     } catch (error) {
       throw new BadRequestException('There is no such dispatcher');

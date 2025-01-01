@@ -69,7 +69,7 @@ export class DriverService {
     try {
       const dispatcher = await this.userRepo.findOneByOrFail({ id });
 
-      await this.userRepo.update(id, { ...updateDriverDto });
+      await this.userRepo.update(id, { ...updateDriverDto, company_id: { id: updateDriverDto.company_id } });
       return { status: 200, message: `Dispatcher ${dispatcher.full_name} updated successfully` };
     } catch (error) {
       throw new BadRequestException('There is no such dispatcher');
