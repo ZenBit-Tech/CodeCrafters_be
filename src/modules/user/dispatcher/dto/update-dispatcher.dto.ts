@@ -23,4 +23,9 @@ export class UpdateDispatcherDto {
   @IsEmail()
   @ApiProperty({ example: 'example@gmail.com', description: 'dispatcher email' })
   email: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @ApiProperty({ example: 1, description: 'Company ID of the driver' })
+  company_id: number;
 }

@@ -2,7 +2,8 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ORDER_PAGE_LENGTH } from 'common/constants/numbers';
 import { User } from 'common/database/entities/user.entity';
-import { FindManyOptions, FindOptionsWhere, Like, Repository } from 'typeorm';
+import { Roles } from 'common/enums/enums';
+import { FindManyOptions, FindOptionsWhere, Like, Not, Repository } from 'typeorm';
 
 import { UserQueryParams } from './types';
 
@@ -22,11 +23,20 @@ export class UserService {
       ? <Record<string, 'ASC' | 'DESC'>>JSON.parse(sortBy)
       : { createdAt: 'DESC' };
 
-    const whereCondition: FindOptionsWhere<User> = {
-      ...(search && { full_name: Like(`%${search}%`) }),
-      ...(role && { role }),
-      company_id: { id: queryParams.companyId },
-    };
+    const whereCondition: FindOptionsWhere<User>[] = [
+      {
+        company_id: { id: queryParams.companyId },
+        role: Not(Roles.SUPERADMIN),
+        ...(role && { role }),
+        ...(search && { full_name: Like(`%${search}%`) }),
+      },
+      {
+        company_id: { id: queryParams.companyId },
+        role: Not(Roles.SUPERADMIN),
+        ...(role && { role }),
+        ...(search && { email: Like(`%${search}%`) }),
+      },
+    ];
 
     const findSettings: FindManyOptions<User> = {
       skip: (pageNumber - 1) * ORDER_PAGE_LENGTH,

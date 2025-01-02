@@ -23,4 +23,9 @@ export class UpdateDriverDto {
   @IsEmail()
   @ApiProperty({ example: 'example@gmail.com', description: 'driver email' })
   email: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @ApiProperty({ example: 1, description: 'Company ID of the driver' })
+  company_id: number;
 }
