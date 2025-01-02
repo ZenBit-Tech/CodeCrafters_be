@@ -11,6 +11,7 @@ import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
 import { stringToBoolean } from 'common/utils/stringToBoolean';
 import { TransformedOrder } from 'common/utils/transformOrderObject';
 
+import { OrderDto } from './dto/order.dto';
 import { OrdersResponse } from './dto/response.dto';
 import { OrderDetails } from './interfaces/orderDetails';
 import { OrdersService } from './orders.service';
@@ -132,6 +133,28 @@ export class OrdersController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async getNewOrdersCount(@Query('companyId') companyId: number): Promise<number> {
     return this.ordersService.getNewOrdersCount(companyId);
+  }
+
+  @Get('by-routeId')
+  @ApiOperation({ summary: 'Get orders by route ID' })
+  @ApiQuery({
+    name: 'routeId',
+    type: Number,
+    description: 'The ID of the route',
+    example: 1,
+    required: true,
+  })
+  @ApiResponse({
+    status: 200,
+    type: [OrderDto],
+    description: 'Array of orders associated with the route',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Route not found or no orders found for the route',
+  })
+  async getOrdersByRouteId(@Query('routeId', ParseIntPipe) routeId: number): Promise<OrderDto[]> {
+    return this.ordersService.getOrdersByRouteId(routeId);
   }
 
   @Post('failed-reason')

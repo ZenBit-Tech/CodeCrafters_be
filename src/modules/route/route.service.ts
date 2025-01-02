@@ -133,26 +133,32 @@ export class RouteService {
   }
 
   async getRouteFilters(startDate: Date, endDate: Date) {
-    // todo try catch statement
-    const filters = await this.routeRepo
-      .createQueryBuilder('route')
-      .select(['DISTINCT user.full_name AS driver', 'COUNT(order.id) AS stopsCount', 'route.status AS status'])
-      .leftJoin('route.user_id', 'user')
-      .leftJoin('route.orders', 'order')
-      .where('route.submission_date BETWEEN :startDate AND :endDate', { startDate, endDate })
-      .groupBy('user.full_name, route.status')
-      .addGroupBy('route.status')
-      .getRawMany<FilterData>();
+    try {
+      if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+        throw new Error('Invalid date parameters');
+      }
 
-    const uniqueDrivers = Array.from(new Set(filters.map((filter) => filter.driver)));
-    const uniqueStops = Array.from(new Set(filters.map((filter) => filter.stopsCount)));
-    const uniqueStatuses = Array.from(new Set(filters.map((filter) => filter.status)));
+      const filters = await this.routeRepo
+        .createQueryBuilder('route')
+        .select(['user.full_name AS driver', 'COUNT(order.id) AS stopsCount', 'route.status AS status', 'route.id AS routeId'])
+        .leftJoin('route.user_id', 'user')
+        .leftJoin('route.orders', 'order')
+        .where('route.submission_date BETWEEN :startDate AND :endDate', { startDate, endDate })
+        .groupBy('route.id, user.full_name, route.status')
+        .getRawMany<FilterData>();
 
-    return {
-      drivers: uniqueDrivers,
-      stops: uniqueStops,
-      statuses: uniqueStatuses,
-    };
+      const uniqueDrivers = Array.from(new Set(filters.map((filter) => filter.driver)));
+      const uniqueStops = Array.from(new Set(filters.map((filter) => parseInt(filter.stopsCount, 10)))).sort((a, b) => a - b);
+      const uniqueStatuses = Array.from(new Set(filters.map((filter) => filter.status)));
+
+      return {
+        drivers: uniqueDrivers,
+        stops: uniqueStops,
+        statuses: uniqueStatuses,
+      };
+    } catch (error) {
+      throw new Error(`Failed to fetch route filters`);
+    }
   }
 
   async getRoutesByDateRange(
@@ -181,6 +187,7 @@ export class RouteService {
       .leftJoin('route.orders', 'order')
       .where('route.submission_date BETWEEN :startDate AND :endDate', { startDate, endDate })
       .addSelect('COUNT(order.id)', 'ordersCount')
+      .addSelect('SUM(CASE WHEN order.failed_reason IS NOT NULL THEN 1 ELSE 0 END) AS failedOrdersCount')
       .groupBy('route.id');
 
     if (searchQuery) {
@@ -200,27 +207,28 @@ export class RouteService {
     }
 
     if (isRouteTimeSort) {
-      queryBuilder
-        .addSelect(`TIMESTAMPDIFF(MINUTE, route.submission_date, route.arrival_date)`, 'routeMinutes')
-        .orderBy('routeMinutes', sortOrder);
+      queryBuilder.orderBy('route.submission_date', sortOrder);
     } else if (sortField === 'ordersCount') {
       queryBuilder.orderBy('ordersCount', sortOrder);
     } else {
       queryBuilder.orderBy(sortField === 'user_id.full_name' ? 'user.full_name' : `route.${sortField}`, sortOrder);
     }
 
-    // todo try catch statement
-    const routes = await queryBuilder.getRawMany<RouteData>();
+    try {
+      const routes = await queryBuilder.getRawMany<RouteData>();
 
-    if (!routes.length) {
-      if (searchQuery) {
-        throw new NotFoundException(new ErrorResponse(404, `No routes found for user with name matching "${searchQuery}"`));
-      } else {
-        throw new NotFoundException(new ErrorResponse(404, 'No routes found in the specified date range'));
+      if (!routes.length) {
+        if (searchQuery) {
+          throw new NotFoundException(new ErrorResponse(404, `No routes found for user with name matching "${searchQuery}"`));
+        } else {
+          throw new NotFoundException(new ErrorResponse(404, 'No routes found in the specified date range'));
+        }
       }
-    }
 
-    return routes;
+      return routes;
+    } catch (error) {
+      throw new InternalServerErrorException(new ErrorResponse(500, 'An error occurred while fetching routes.'));
+    }
   }
 
   async calculateRouteDistance(cities: string[]) {

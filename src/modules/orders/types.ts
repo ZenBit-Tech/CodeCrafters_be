@@ -19,3 +19,16 @@ export interface OrderServiceParams {
   isNew: boolean;
   startDate: Date | undefined;
 }
+
+export interface OrderData {
+  id: number;
+  collection_date: Date;
+  collection_time_start: Date;
+  collection_time_end: Date;
+  collection_address: string;
+  status: string;
+  airport_name: string;
+  flight_id: string;
+  ticket_photo: string;
+  failed_reason: string | null;
+}

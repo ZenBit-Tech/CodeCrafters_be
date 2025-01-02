@@ -10,6 +10,7 @@ import { OrderWithRouteAndCustomer } from 'common/types/interfaces';
 import { tranformOrderObject, TransformedOrder } from 'common/utils/transformOrderObject';
 import { FindManyOptions, IsNull, Like, Between, Not, Repository, EntityNotFoundError } from 'typeorm';
 
+import { OrderDto } from './dto/order.dto';
 import { OrderDetails } from './interfaces/orderDetails';
 import { OrderServiceParams } from './types';
 
@@ -380,5 +381,35 @@ export class OrdersService {
       }
       throw new InternalServerErrorException('Something went wrong while updating the order.');
     }
+  }
+
+  async getOrdersByRouteId(routeId: number): Promise<OrderDto[]> {
+    const findOptions: FindManyOptions<Order> = {
+      where: { route: { id: routeId } },
+      relations: ['route', 'route.user_id'],
+    };
+
+    const orders = await this.orderRepository.find(findOptions);
+
+    if (!orders.length) {
+      throw new NotFoundException('No orders found for the provided route ID');
+    }
+
+    return orders.map((order) => ({
+      id: order.id,
+      collection_date: order.collection_date,
+      collection_time_start: order.collection_time_start,
+      collection_time_end: order.collection_time_end,
+      collection_address: order.collection_address,
+      status: order.status,
+      failed_reason: order.failed_reason,
+      user: order.route?.user_id
+        ? {
+            id: order.route.user_id.id,
+            full_name: order.route.user_id.full_name,
+            email: order.route.user_id.email,
+          }
+        : null,
+    }));
   }
 }
