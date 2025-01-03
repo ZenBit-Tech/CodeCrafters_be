@@ -412,4 +412,27 @@ export class OrdersService {
         : null,
     }));
   }
+
+  async getOrdersByRoute(orderId: number): Promise<Order[]> {
+    try {
+      const order = await this.orderRepository.findOneOrFail({
+        where: { id: orderId },
+        relations: ['route'],
+      });
+
+      if (!order.route) {
+        throw new NotFoundException(`Order with ID ${orderId} does not belong to any route`);
+      }
+
+      return await this.orderRepository.find({
+        where: { route: { id: order.route.id } },
+      });
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      throw new InternalServerErrorException('Error fetching orders for route');
+    }
+  }
 }
