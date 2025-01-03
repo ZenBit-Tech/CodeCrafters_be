@@ -262,4 +262,18 @@ export class OrdersController {
   async getOrderData(@Param('id', ParseIntPipe) id: number): Promise<OrderDetails> {
     return this.ordersService.getOne(id);
   }
+
+  @Get('route/:orderId')
+  @ApiOperation({ summary: 'Retrieve all orders for a specific route by order ID' })
+  @ApiParam({ name: 'orderId', description: 'ID of the order to find related route', example: 1 })
+  @ApiResponse({
+    status: 200,
+    description: 'List of orders associated with the route',
+    type: [Order],
+  })
+  @ApiResponse({ status: 404, description: 'Order or Route not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  async getOrdersByRoute(@Param('orderId', ParseIntPipe) orderId: number): Promise<Order[]> {
+    return this.ordersService.getOrdersByRoute(orderId);
+  }
 }
