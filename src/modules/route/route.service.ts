@@ -11,7 +11,7 @@ import { NotificationTypes, OrderStatuses, RouteStatuses, SortOrder } from 'comm
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { sortOrdersByRouteObject, transformRouteObject } from 'common/utils/transformRouteObject';
-import { DeleteResult, EntityNotFoundError, Repository, Between } from 'typeorm';
+import { DeleteResult, EntityNotFoundError, Repository, Between, DataSource } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
@@ -29,6 +29,7 @@ export class RouteService {
     private readonly notificationRepo: Repository<Notification>,
     @InjectRepository(User)
     private readonly configService: ConfigService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(createRouteDto: CreateRouteDto[]): Promise<SuccessResponse> {
@@ -322,17 +323,43 @@ export class RouteService {
   }
 
   async updateRouteStatus(routeId: number, updateRouteStatusDto: UpdateRouteStatusDto): Promise<RouteInform> {
-    try {
-      await this.routeRepo.findOneOrFail({ where: { id: routeId, user_id: { id: updateRouteStatusDto.driverId } } });
+    const queryRunner = this.dataSource.createQueryRunner();
 
-      await this.routeRepo.update(routeId, { status: updateRouteStatusDto.status });
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const route = await this.routeRepo.findOneOrFail({
+        where: { id: routeId, user_id: { id: updateRouteStatusDto.driverId } },
+        relations: ['orders'],
+      });
+
+      route.status = updateRouteStatusDto.status;
+      await queryRunner.manager.save(route);
+
+      if (route.orders.length > 0) {
+        const updatedOrders = route.orders.map((order) => {
+          if (order.status === OrderStatuses.UPCOMING) {
+            order.status = OrderStatuses.ON_TIME;
+          }
+          return order;
+        });
+
+        await queryRunner.manager.save(updatedOrders);
+      }
+
+      await queryRunner.commitTransaction();
 
       return await this.getOne(routeId);
-    } catch (error) {
+    } catch (error: unknown) {
+      await queryRunner.rollbackTransaction();
+
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('There is no such route');
       }
-      throw new InternalServerErrorException('Something went wrong');
+      throw new InternalServerErrorException(error);
+    } finally {
+      await queryRunner.release();
     }
   }
 

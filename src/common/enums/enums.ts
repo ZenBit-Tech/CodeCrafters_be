@@ -17,6 +17,7 @@ export enum OrderStatuses {
   NOT_ARRIVED = 'Not arrived',
   AT_RISK = 'At Risk',
   UPCOMING = 'Upcoming',
+  ON_TIME = 'On Time',
   EMPTY_STATUS = '',
   CUSTOMER_INFORMED = 'Customer Informed',
   TRANSPORTER_LOCKED = 'Transporter Locked',
