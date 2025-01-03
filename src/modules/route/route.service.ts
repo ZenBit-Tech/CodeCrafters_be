@@ -11,7 +11,7 @@ import { NotificationTypes, OrderStatuses, RouteStatuses, SortOrder } from 'comm
 import { SuccessResponse } from 'common/types/response-success.dto';
 import { RouteInform } from 'common/types/routeInformResponse';
 import { sortOrdersByRouteObject, transformRouteObject } from 'common/utils/transformRouteObject';
-import { DeleteResult, EntityManager, EntityNotFoundError, Repository, Between } from 'typeorm';
+import { DeleteResult, EntityNotFoundError, Repository, Between } from 'typeorm';
 
 import { CreateRouteDto } from './dto/create-route.dto';
 import { ErrorResponse } from './dto/error-response.dto';
@@ -28,7 +28,6 @@ export class RouteService {
     @InjectRepository(Notification)
     private readonly notificationRepo: Repository<Notification>,
     @InjectRepository(User)
-    private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
   ) {}
 
@@ -316,14 +315,16 @@ export class RouteService {
 
   async updateRouteStatus(routeId: number, updateRouteStatusDto: UpdateRouteStatusDto): Promise<RouteInform> {
     try {
-      const route = await this.routeRepo.findOneOrFail({ where: { id: routeId, user_id: { id: updateRouteStatusDto.driverId } } });
+      await this.routeRepo.findOneOrFail({ where: { id: routeId, user_id: { id: updateRouteStatusDto.driverId } } });
 
-      route.status = updateRouteStatusDto.status;
-      await this.entityManager.save(route);
+      await this.routeRepo.update(routeId, { status: updateRouteStatusDto.status });
 
       return await this.getOne(routeId);
     } catch (error) {
-      throw new NotFoundException('There is no such route');
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException('There is no such route');
+      }
+      throw new InternalServerErrorException('Something went wrong');
     }
   }
 
