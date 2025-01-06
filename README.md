@@ -1,85 +1,77 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# CodeCrafters_be
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**CodeCrafters_be** is the backend solution for the **CodeCrafters** project, which enables users to efficiently manage their own delivery company. This API handles order management, route optimization, and real-time user tracking, with a focus on providing scalable and reliable solutions for delivery operations.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Key Features
 
-## Description
+- **User Management**: Secure and efficient user authentication and role-based access control (Admin, Driver, Customer).
+- **Order Management**: Create, track, and update orders with real-time status changes.
+- **Route Optimization**: Efficient routing algorithms to minimize delivery times and fuel costs.
+- **Real-Time Notifications**: Keep drivers and customers informed with automated email notifications.
+- **Database Integration**: Seamless data persistence with PostgreSQL.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Technologies Used
+
+- **NestJS**: A progressive Node.js framework for building efficient, scalable server-side applications.
+- **MySQL**: A relational database for storing user and order data.
+- **TypeScript**: Strongly typed JavaScript for building more reliable and maintainable code.
+- **Docker**: Containerization for consistent development and production environments.
+- **JWT**: JSON Web Token for secure authentication and authorization.
 
 ## Installation
 
-```bash
-$ npm install
-```
+### Prerequisites
 
-## Running the app
+Ensure that you have the following installed:
 
-```bash
-# development
-$ npm run start
+- [Node.js](https://nodejs.org/en/) (v20+)
+- [Docker](https://www.docker.com/)
 
-# watch mode
-$ npm run start:dev
+### Setup
 
-# production mode
-$ npm run start:prod
-```
+1. Clone the repository:
 
-## Guards
+   ```bash
+   git clone https://github.com/ZenBit-Tech/CodeCrafters_be.git
+   cd CodeCrafters_be
+   ```
 
-### Roles guard
+2. Create a .env file from the provided .env.example:
 
-When you use the RolesGuard in your controller, apply the @SetMetadata('roles', [Roles.SUPERADMIN]) decorator to specify the required roles
+   ```bash
+   cp .env.example .env
+   ```
 
-```TS
-  @Get()
-  @UseGuards(RolesGuard)
-  @SetMetadata('roles', [Roles.SUPERADMIN])
-```
+3. Install dependencies:
 
-## Test
+   ```bash
+   npm install
+   ```
 
-```bash
-# unit tests
-$ npm run test
+4. Start the DB with Docker:
 
-# e2e tests
-$ npm run test:e2e
+   ```bash
+   docker-compose up
+   ```
 
-# test coverage
-$ npm run test:cov
-```
+5. Run database migrations:
 
-## Support
+   ```bash
+   npm run seed:superadmin
+   npm run seed:general
+   ```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+6. Start the application in development mode:
+   ```bash
+   npm run start:dev
+   ```
 
-## Stay in touch
+## API Documentation
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+To explore the API, we provide interactive documentation using Swagger UI. Once the app is running locally, you can access the API docs at:
 
-## License
+http://localhost:4000/logistic-app/api-documentation
 
-Nest is [MIT licensed](LICENSE).
+## DB schema
+
+![image](https://github.com/user-attachments/assets/81407e2f-f1ea-4949-8a7e-fc69daa8fd75)
