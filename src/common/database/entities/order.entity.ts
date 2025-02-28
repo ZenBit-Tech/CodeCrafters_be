@@ -15,7 +15,7 @@ export class Order {
   @Column({ default: false })
   is_order_locked: boolean;
 
-  @Column()
+  @Column({ default: "" })
   lock_number: string;
 
   @Column({ nullable: false })

@@ -78,7 +78,7 @@ export class RouteService {
             type: NotificationTypes.ROUTE,
             is_readed: false,
             link_text: `${savedRoute.id}`,
-            link_href: ``,
+            link_href: `${savedRoute.id}`,
             message: 'You have received a new route',
             user_id: driver,
           }),
