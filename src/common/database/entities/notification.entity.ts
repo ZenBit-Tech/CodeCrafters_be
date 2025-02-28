@@ -1,6 +1,7 @@
 import { NotificationTypes } from 'common/enums/enums';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
+import { Order } from './order.entity';
 import { User } from './user.entity';
 
 @Entity()
@@ -26,6 +27,10 @@ export class Notification {
   @ManyToOne(() => User, (user) => user.id, { cascade: true, eager: true })
   @JoinColumn()
   user_id: User;
+
+  @OneToOne(() => Order, (order) => order.notification, { cascade: true, onDelete: 'CASCADE' })
+  @JoinColumn()
+  order: Order;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

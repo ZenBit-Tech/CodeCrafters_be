@@ -22,6 +22,15 @@ export class NotificationsController {
     return this.notificationsService.create(createNotificationDto);
   }
 
+  @Post('orders')
+  @UseGuards(RolesGuard)
+  @SetMetadata('roles', [Roles.ADMIN, Roles.DISPATCHER])
+  @ApiOperation({ summary: 'Create a new notification' })
+  @ApiResponse({ status: 201, description: 'Notification created', type: Notification })
+  async createOrderNotification(@Body() createNotificationDto: { notification: string; id: number }): Promise<Notification> {
+    return this.notificationsService.createOrderNotification(createNotificationDto);
+  }
+
   @Get(':userId')
   @UseGuards(RolesGuard)
   @SetMetadata('roles', [Roles.DRIVER])

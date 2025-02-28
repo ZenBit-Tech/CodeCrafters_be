@@ -1,9 +1,20 @@
 import { OrderStatuses } from 'common/enums/enums';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 import { Company } from './company.entity';
 import { Customer } from './customer.entity';
 import { Luggage } from './luggage.entity';
+import { Notification } from './notification.entity';
 import { Route } from './route.entity';
 import { User } from './user.entity';
 
@@ -15,7 +26,7 @@ export class Order {
   @Column({ default: false })
   is_order_locked: boolean;
 
-  @Column({ default: "" })
+  @Column({ default: '' })
   lock_number: string;
 
   @Column({ nullable: false })
@@ -41,6 +52,9 @@ export class Order {
 
   @Column({ nullable: false, default: 'files/tickets/image 30.png' })
   ticket_photo: string;
+
+  @OneToOne(() => Notification, (notification) => notification.order)
+  notification: Notification;
 
   @Column({ type: 'text', nullable: true })
   failed_reason: string | null;

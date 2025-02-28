@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'common/database/entities/notification.entity';
+import { Order } from 'common/database/entities/order.entity';
 import { User } from 'common/database/entities/user.entity';
+import { NotificationTypes } from 'common/enums/enums';
 import { GetNotificationsResponse, transformNotifications } from 'common/utils/transformNotifications';
 import { EntityManager, Repository } from 'typeorm';
 
@@ -15,6 +17,9 @@ export class NotificationsService {
 
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+
+    @InjectRepository(Order)
+    private readonly orderRepo: Repository<User>,
 
     private readonly entityManager: EntityManager,
   ) {}
@@ -34,6 +39,38 @@ export class NotificationsService {
     });
 
     return this.notificationsRepo.save(notification);
+  }
+
+  async createOrderNotification(createOrderNotification: { id: number; notification: string }): Promise<Notification> {
+    try {
+      const order = await this.orderRepo.findOneOrFail({ where: { id: +createOrderNotification.id } });
+
+      const notification = await this.notificationsRepo.findOne({ where: { order: { id: +createOrderNotification.id } } });
+
+      if (!notification) {
+        const newNotification = this.notificationsRepo.create({
+          type: NotificationTypes.LUGGAGE,
+          link_text: createOrderNotification.notification,
+          link_href: createOrderNotification.notification,
+          message: createOrderNotification.notification,
+          order,
+        });
+
+        return await this.notificationsRepo.save(newNotification);
+      }
+
+      await this.notificationsRepo.update(notification.id, {
+        type: NotificationTypes.LUGGAGE,
+        link_text: createOrderNotification.notification,
+        link_href: createOrderNotification.notification,
+        message: createOrderNotification.notification,
+        order,
+      });
+
+      return notification;
+    } catch (error) {
+      throw new NotFoundException('Cant create notifications');
+    }
   }
 
   async getNotifications(userId: number): Promise<GetNotificationsResponse> {
